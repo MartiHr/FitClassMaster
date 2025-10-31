@@ -16,17 +16,24 @@ func main() {
 	templates = template.Must(template.ParseGlob(filepath.Join("internal", "templates", "*.gohtml")))
 
 	r := chi.NewRouter()
+
+	// Middlewares
 	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
 
 	// Static files
-	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("internal/static"))))
+	fileServer := http.FileServer(http.Dir("internal/static"))
+	r.Handle("/static/*", http.StripPrefix("/static/", fileServer))
 
 	// Routes
 	r.Get("/", homeHandler)
 	r.Get("/htmx/hello", helloHtmx)
 
 	log.Println("✅ Server running at http://localhost:8080")
-	http.ListenAndServe(":8080", r)
+	err := http.ListenAndServe(":8080", r)
+	if err != nil {
+		return
+	}
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
