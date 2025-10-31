@@ -1,0 +1,9 @@
+{{ define "content" }}
+    <h1>Welcome to FitClassMaster ✅</h1>
+
+    <button hx-get="/htmx/hello" hx-target="#result">
+        Hello from HTMX
+    </button>
+
+    <div id="result"></div>
+{{ end }}
