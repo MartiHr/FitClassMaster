@@ -2,7 +2,6 @@ package templates
 
 import (
 	"html/template"
-	"log"
 	"net/http"
 	"path/filepath"
 )
@@ -10,13 +9,19 @@ import (
 var Tmpl *template.Template
 
 func Init() {
+	// Parse all templates together so they can reference each other
 	Tmpl = template.Must(template.ParseGlob(filepath.Join("internal", "templates", "*.gohtml")))
 }
 
 func Render(w http.ResponseWriter, name string, data any) {
-	log.Println("Render:", name)
+	err := Tmpl.ExecuteTemplate(w, "layout", struct {
+		Data any
+		Page string
+	}{
+		Data: data,
+		Page: name, // tells layout which content to show
+	})
 
-	err := Tmpl.ExecuteTemplate(w, "layout.gohtml", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
