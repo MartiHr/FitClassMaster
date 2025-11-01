@@ -2,24 +2,25 @@ package main
 
 import (
 	"FitClassMaster/internal/config"
+	"FitClassMaster/internal/handlers"
 	"FitClassMaster/internal/models"
+	"FitClassMaster/internal/templates"
 	"log"
 	"net/http"
-	"path/filepath"
-	"text/template"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-var templates *template.Template
-
 func main() {
-	// Templates
-	templates = template.Must(template.ParseGlob(filepath.Join("internal", "templates", "*.gohtml")))
-
-	// Init DB
+	// Init DB & session
 	config.InitDB()
+	config.InitSessionStore()
+
+	// Init template parsing
+	templates.Init()
+
+	// Auto migrate
 	if err := config.DB.AutoMigrate(&models.User{}); err != nil {
 		log.Fatalf("Migration failed: %v", err)
 	}
@@ -28,38 +29,26 @@ func main() {
 	r := chi.NewRouter()
 
 	// Middlewares
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
+	r.Use(middleware.Logger)    // chi logger
+	r.Use(middleware.Recoverer) // chi recoverer
+	//r.Use(middleware.LoadSession)
 
 	// Static files
 	fileServer := http.FileServer(http.Dir("internal/static"))
 	r.Handle("/static/*", http.StripPrefix("/static/", fileServer))
 
-	// Routes
-	r.Get("/", homeHandler)
-	r.Get("/htmx/hello", helloHtmx)
+	// Handlers
+	homeH := handlers.NewHomeHandler()
+	//authH := handlers.NewAuthHandler(authService)
+
+	// Public routes
+	r.Get("/", homeH.Home)
+	r.Get("/htmx/hello", homeH.HelloHtmx)
 
 	// Run server
 	log.Println("✅ Server running at http://localhost:8080")
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {
 		return
-	}
-}
-
-func homeHandler(w http.ResponseWriter, r *http.Request) {
-	render(w, "home.gohtml", map[string]any{
-		"Title": "FitClassMaster — Home",
-	})
-}
-
-func helloHtmx(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello from HTMX! ✅"))
-}
-
-func render(w http.ResponseWriter, tmpl string, data any) {
-	err := templates.ExecuteTemplate(w, "layout.gohtml", data)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
