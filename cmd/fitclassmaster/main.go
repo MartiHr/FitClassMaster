@@ -1,6 +1,8 @@
 package main
 
 import (
+	"FitClassMaster/internal/config"
+	"FitClassMaster/internal/models"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -13,8 +15,16 @@ import (
 var templates *template.Template
 
 func main() {
+	// Templates
 	templates = template.Must(template.ParseGlob(filepath.Join("internal", "templates", "*.gohtml")))
 
+	// Init DB
+	config.InitDB()
+	if err := config.DB.AutoMigrate(&models.User{}); err != nil {
+		log.Fatalf("Migration failed: %v", err)
+	}
+
+	// Router setup
 	r := chi.NewRouter()
 
 	// Middlewares
@@ -29,6 +39,7 @@ func main() {
 	r.Get("/", homeHandler)
 	r.Get("/htmx/hello", helloHtmx)
 
+	// Run server
 	log.Println("✅ Server running at http://localhost:8080")
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {

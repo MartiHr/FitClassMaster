@@ -10,15 +10,14 @@ import (
 
 var DB *gorm.DB
 
-func initDB() {
+func InitDB() {
 	dsn := os.Getenv("DB_DSN")
 	if dsn == "" {
 		log.Fatal("DB_DSN env var not set")
 	}
 
 	db, err := gorm.Open(sqlserver.Open(dsn), &gorm.Config{})
-
-	if err != nill {
+	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
