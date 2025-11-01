@@ -2,6 +2,7 @@ package templates
 
 import (
 	"html/template"
+	"log"
 	"net/http"
 	"path/filepath"
 )
@@ -13,7 +14,9 @@ func Init() {
 }
 
 func Render(w http.ResponseWriter, name string, data any) {
-	err := Tmpl.ExecuteTemplate(w, name, data)
+	log.Println("Render:", name)
+
+	err := Tmpl.ExecuteTemplate(w, "layout.gohtml", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
