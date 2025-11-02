@@ -29,6 +29,9 @@
 {{ end }}
 
 {{ define "register" }}
-    <h2>Register</h2>
-    {{ template "register_form" . }}
+    {{ define "content" }}
+        <h2>Register</h2>
+        {{ template "register_form" . }}
+    {{ end }}
+    {{ template "layout" . }}
 {{ end }}

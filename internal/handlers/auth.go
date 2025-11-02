@@ -83,10 +83,8 @@ func (h *AuthHandler) RegisterPost(w http.ResponseWriter, r *http.Request) {
 func (h *AuthHandler) renderRegisterResponse(w http.ResponseWriter, r *http.Request, data map[string]any) {
 	// If it's an HTMX request, return only the form fragment to be swapped
 	if r.Header.Get("HX-Request") == "true" {
-		// Render just the register_form template
-		if err := templates.Tmpl.ExecuteTemplate(w, "register_form", data); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		// Render just the register_form template from the register page file
+		templates.RenderFragment(w, "register", "register_form", data)
 		return
 	}
 	// Otherwise render the full page

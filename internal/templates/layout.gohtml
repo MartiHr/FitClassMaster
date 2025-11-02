@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ .Data.Title }}</title>
+    <title>{{ .Title }}</title>
     <script src="/static/js/htmx.min.js"></script>
     <link rel="stylesheet" href="/static/css/main.css">
 </head>
@@ -16,11 +16,7 @@
 </header>
 
 <main>
-    {{ if eq .Page "home" }}
-        {{ template "home" .Data }}
-    {{ else if eq .Page "register" }}
-        {{ template "register" .Data }}
-    {{ end }}
+    {{ block "content" . }}{{ end }}
 </main>
 </body>
 </html>

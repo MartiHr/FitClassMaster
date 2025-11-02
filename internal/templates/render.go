@@ -1,30 +1,128 @@
 package templates
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
+	"os"
 	"path/filepath"
+	"strings"
 )
 
-var Tmpl *template.Template
+// baseTmpl holds only the shared layout (and any shared partials if added later).
+var baseTmpl *template.Template
 
+// cache holds a fully built template set per page: layout + page file.
+var cache map[string]*template.Template
+
+// devMode enables per-request parsing (hot reload) when DEV_TEMPLATES=1
+var devMode bool
+
+// Init builds the template cache at startup: one set per page (layout + page).
 func Init() {
-	// Parse all templates together so they can reference each other
-	Tmpl = template.Must(template.ParseGlob(filepath.Join("internal", "templates", "*.gohtml")))
+	devMode = os.Getenv("DEV_TEMPLATES") == "1"
+
+	// Parse the layout once
+	baseTmpl = template.Must(template.ParseFiles(
+		filepath.Join("internal", "templates", "layout.gohtml"),
+	))
+
+	// In dev mode, skip building the cache to allow hot reload
+	if devMode {
+		return
+	}
+
+	// Build the per-page cache
+	cache = make(map[string]*template.Template)
+
+	// Find all page files (exclude layout.gohtml)
+	pattern := filepath.Join("internal", "templates", "*.gohtml")
+	files, err := filepath.Glob(pattern)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, f := range files {
+		if filepath.Base(f) == "layout.gohtml" {
+			continue
+		}
+
+		// Page name is file base without extension (e.g., home.gohtml -> "home")
+		base := filepath.Base(f)
+		name := strings.TrimSuffix(base, filepath.Ext(base))
+
+		// Clone base and parse the page into it so it gets that page’s `content` override
+		cl, err := baseTmpl.Clone()
+		if err != nil {
+			panic(err)
+		}
+		if _, err := cl.ParseFiles(f); err != nil {
+			panic(err)
+		}
+
+		cache[name] = cl
+	}
 }
 
+// Render renders a full page using the cache in prod, or per-request parse in dev.
 func Render(w http.ResponseWriter, name string, data any) {
-	// Render the shared layout and let it include the requested page template by name.
-	// We pass `{Data, Page}` so the layout can access shared fields like title via `.Data`.
-	err := Tmpl.ExecuteTemplate(w, "layout", struct {
-		Data any
-		Page string
-	}{
-		Data: data,
-		Page: name, // e.g. "home" or "register"
-	})
+	if devMode {
+		// Dev: clone + parse page each request for hot reload
+		cl, err := baseTmpl.Clone()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		pagePath := filepath.Join("internal", "templates", name+".gohtml")
+		cl, err = cl.ParseFiles(pagePath)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if err := cl.ExecuteTemplate(w, "layout", data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
 
-	if err != nil {
+	// Prod: use cached set
+	t, ok := cache[name]
+	if !ok {
+		http.Error(w, fmt.Sprintf("template not found: %s", name), http.StatusNotFound)
+		return
+	}
+	if err := t.ExecuteTemplate(w, "layout", data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+// RenderFragment executes a named template (e.g., partial) from the cached set of a page
+// in prod, or from a per-request parsed set in dev.
+func RenderFragment(w http.ResponseWriter, pageName, tmplName string, data any) {
+	if devMode {
+		cl, err := baseTmpl.Clone()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		pagePath := filepath.Join("internal", "templates", pageName+".gohtml")
+		cl, err = cl.ParseFiles(pagePath)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if err := cl.ExecuteTemplate(w, tmplName, data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	t, ok := cache[pageName]
+	if !ok {
+		http.Error(w, fmt.Sprintf("template not found: %s", pageName), http.StatusNotFound)
+		return
+	}
+	if err := t.ExecuteTemplate(w, tmplName, data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
