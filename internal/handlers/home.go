@@ -12,9 +12,7 @@ func NewHomeHandler() *HomeHandler {
 }
 
 func (h *HomeHandler) Home(w http.ResponseWriter, r *http.Request) {
-	templates.Render(w, "home.gohtml", map[string]any{
-		"Title": "FitClassMaster — Home",
-	})
+	templates.Render(w, "home", map[string]any{"Title": "FitClassMaster — Home"})
 }
 
 func (h *HomeHandler) HelloHtmx(w http.ResponseWriter, r *http.Request) {

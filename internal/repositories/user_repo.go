@@ -28,7 +28,7 @@ func (r *UserRepo) GetById(id int) (user *models.User, err error) {
 func (r *UserRepo) GetByEmail(email string) (user *models.User, err error) {
 	var u models.User
 
-	if err := config.DB.Where("email = ?", email).First(&user).Error; err != nil {
+	if err := config.DB.Where("email = ?", email).First(&u).Error; err != nil {
 		return nil, err
 	}
 
