@@ -46,6 +46,7 @@ func main() {
 	r.Get("/htmx/hello", homeH.HelloHtmx)
 	r.Get("/register", authH.RegisterPage)
 	r.Post("/register", authH.RegisterPost)
+	r.Get("/login", authH.LoginPage)
 
 	// Run server
 	log.Println("✅ Server running at http://localhost:8080")

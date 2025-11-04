@@ -5,14 +5,9 @@ import (
 	"FitClassMaster/internal/repositories"
 	"FitClassMaster/internal/services"
 	"FitClassMaster/internal/templates"
-	"encoding/gob"
 	"net/http"
 	"strings"
 )
-
-func init() {
-	gob.Register(uint(0)) // so session can store user ID
-}
 
 type AuthHandler struct {
 	AuthService *services.AuthService
