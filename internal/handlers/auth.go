@@ -115,6 +115,18 @@ func (h *AuthHandler) LoginPost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "session error", http.StatusInternalServerError)
 		return
 	}
+	// Save email and derived username for quick access in templates
+	if err := auth.SaveUserMeta(w, r, user.Email); err != nil {
+		http.Error(w, "session error", http.StatusInternalServerError)
+		return
+	}
+
+	// If this was an HTMX request, instruct htmx to perform a full redirect
+	if r.Header.Get("HX-Request") == "true" {
+		w.Header().Set("HX-Redirect", "/")
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

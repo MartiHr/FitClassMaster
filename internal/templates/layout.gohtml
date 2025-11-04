@@ -11,9 +11,15 @@
 <header>
     <nav>
         <a href="/">Home</a>
-        <a href="/register">Register</a>
-        <a href="/login">Login</a>
-        <a href="/logout">Logout</a>
+        {{ if .IsAuthenticated }}
+            <span>Hi, {{ .Username }}</span>
+            <form method="POST" action="/logout" style="display:inline;">
+                <button type="submit">Logout</button>
+            </form>
+        {{ else }}
+            <a href="/register">Register</a>
+            <a href="/login">Login</a>
+        {{ end }}   
     </nav>
 </header>
 

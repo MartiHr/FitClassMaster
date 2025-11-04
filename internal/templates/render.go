@@ -1,6 +1,7 @@
 package templates
 
 import (
+	"FitClassMaster/internal/auth"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -66,14 +67,30 @@ func Init() {
 
 // SmartRender automatically detects HTMX + can fall back to fragment
 func SmartRender(w http.ResponseWriter, r *http.Request, page string, fragment string, data any) {
-	isHTMX := r.Header.Get("HX-Request") == "true"
+	// Ensure we have a map[string]any to enrich
+	var m map[string]any
+	switch v := data.(type) {
+	case nil:
+		m = map[string]any{}
+	case map[string]any:
+		m = v
+	default:
+		m = map[string]any{"Data": v}
+	}
 
+	// Inject auth context for templates
+	m["IsAuthenticated"] = auth.IsAuthenticated(r)
+	if username, ok := auth.GetUsernameFromSession(r); ok {
+		m["Username"] = username
+	}
+
+	isHTMX := r.Header.Get("HX-Request") == "true"
 	if isHTMX && fragment != "" {
-		renderFragment(w, page, fragment, data)
+		renderFragment(w, page, fragment, m)
 		return
 	}
 
-	render(w, page, data)
+	render(w, page, m)
 }
 
 // Render renders a full page using the cache in prod, or per-request parse in dev.
