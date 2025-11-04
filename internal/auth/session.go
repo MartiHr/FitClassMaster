@@ -8,13 +8,13 @@ import (
 const SessionName = "app_session"
 const SessionUserIDKey = "user_id"
 
-func saveUserSession(w http.ResponseWriter, r *http.Request, userID string) error {
+func SaveUserSession(w http.ResponseWriter, r *http.Request, userID uint) error {
 	session, _ := config.Store.Get(r, SessionName)
 	session.Values[SessionUserIDKey] = userID
 	return session.Save(r, w)
 }
 
-func clearUserSession(w http.ResponseWriter, r *http.Request) error {
+func ClearUserSession(w http.ResponseWriter, r *http.Request) error {
 	session, _ := config.Store.Get(r, SessionName)
 	delete(session.Values, SessionUserIDKey)
 	return session.Save(r, w)

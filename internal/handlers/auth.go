@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"FitClassMaster/internal/auth"
 	"FitClassMaster/internal/models"
 	"FitClassMaster/internal/repositories"
 	"FitClassMaster/internal/services"
@@ -104,14 +105,18 @@ func (h *AuthHandler) LoginPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, err := h.AuthService.Login(email, password)
-
 	if err != nil {
 		data["Error"] = err.Error()
 		templates.SmartRender(w, r, "login", "", data)
+		return
 	}
 
-	data["Success"] = "Login successful"
+	if err := auth.SaveUserSession(w, r, user.ID); err != nil {
+		http.Error(w, "session error", http.StatusInternalServerError)
+		return
+	}
 
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 // Logout (POST)
