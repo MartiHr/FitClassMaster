@@ -2,13 +2,8 @@ package auth
 
 import (
 	"FitClassMaster/internal/config"
-	"encoding/gob"
 	"net/http"
 )
-
-func init() {
-	gob.Register(uint(0)) // so session can store user ID
-}
 
 const SessionName = "app_session"
 const SessionUserIDKey = "user_id"

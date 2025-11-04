@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/gob"
 	"log"
 	"os"
 
@@ -11,6 +12,8 @@ import (
 var DB *gorm.DB
 
 func InitDB() {
+	gob.Register(uint(0)) // so session can store user ID
+
 	dsn := os.Getenv("DB_DSN")
 	if dsn == "" {
 		log.Fatal("DB_DSN env var not set")
