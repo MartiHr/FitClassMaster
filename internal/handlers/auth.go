@@ -121,5 +121,8 @@ func (h *AuthHandler) LoginPost(w http.ResponseWriter, r *http.Request) {
 
 // Logout (POST)
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
-	// TODO: implement
+	// Clear the user session using auth helpers
+	_ = auth.ClearUserSession(w, r)
+	// Redirect to login
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }

@@ -1,9 +1,6 @@
 {{ define "login_form" }}
-    <form id="login-form"
-          hx-post="/login"
-          hx-target="#login-form"
-          hx-swap="outerHTML">
-
+    <form method="POST" action="/login">
+        
         <label>Email:</label>
         <input type="email" name="email" value="{{ .Email }}" required><br>
 

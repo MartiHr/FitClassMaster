@@ -3,8 +3,10 @@ package main
 import (
 	"FitClassMaster/internal/config"
 	"FitClassMaster/internal/handlers"
+	"FitClassMaster/internal/middlewares"
 	"FitClassMaster/internal/models"
 	"FitClassMaster/internal/templates"
+
 	"log"
 	"net/http"
 
@@ -31,7 +33,7 @@ func main() {
 	// Middlewares
 	r.Use(middleware.Logger)    // chi logger
 	r.Use(middleware.Recoverer) // chi recoverer
-	//r.Use(middleware.LoadSession)
+	//r.Use(middlewares.LoadSession)
 
 	// Static files
 	fileServer := http.FileServer(http.Dir("internal/static"))
@@ -47,6 +49,13 @@ func main() {
 	r.Get("/register", authH.RegisterPage)
 	r.Post("/register", authH.RegisterPost)
 	r.Get("/login", authH.LoginPage)
+	r.Post("/login", authH.LoginPost)
+	r.Post("/logout", authH.Logout)
+
+	// Protected example route
+	r.With(middlewares.RequireAuth).Get("/dashboard", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Welcome to your dashboard!"))
+	})
 
 	// Run server
 	log.Println("✅ Server running at http://localhost:8080")

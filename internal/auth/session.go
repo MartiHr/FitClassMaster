@@ -8,20 +8,23 @@ import (
 const SessionName = "app_session"
 const SessionUserIDKey = "user_id"
 
+// SaveUserSession stores the authenticated user's ID (uint) into the session.
 func SaveUserSession(w http.ResponseWriter, r *http.Request, userID uint) error {
 	session, _ := config.Store.Get(r, SessionName)
 	session.Values[SessionUserIDKey] = userID
 	return session.Save(r, w)
 }
 
+// ClearUserSession removes the user ID from the session and persists the change.
 func ClearUserSession(w http.ResponseWriter, r *http.Request) error {
 	session, _ := config.Store.Get(r, SessionName)
 	delete(session.Values, SessionUserIDKey)
 	return session.Save(r, w)
 }
 
-func GetUserIDFromSession(r *http.Request) (string, bool) {
+// GetUserIDFromSession retrieves the user ID from session as uint.
+func GetUserIDFromSession(r *http.Request) (uint, bool) {
 	session, _ := config.Store.Get(r, SessionName)
-	userID, exists := session.Values[SessionUserIDKey].(string)
-	return userID, exists
+	userID, ok := session.Values[SessionUserIDKey].(uint)
+	return userID, ok
 }
