@@ -1,0 +1,28 @@
+{{ define "login_form" }}
+    <form id="login-form"
+          hx-post="/login"
+          hx-target="#login-form"
+          hx-swap="outerHTML">
+
+        <label>Email:</label>
+        <input type="email" name="email" value="{{ .Email }}" required><br>
+
+        <label>Password:</label>
+        <input type="password" name="password" required><br>
+
+        <button type="submit">Login</button>
+
+        {{ if .Error }}
+            <p style="color:red;">{{ .Error }}</p>
+        {{ end }}
+        {{ if .Success }}
+            <p style="color:green;">{{ .Success }}</p>
+        {{ end }}
+
+    </form>
+{{ end }}
+
+{{ define "content" }}
+    <h2>Login</h2>
+    {{ template "login_form" . }}
+{{ end }}

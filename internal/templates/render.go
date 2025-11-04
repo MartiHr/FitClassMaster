@@ -64,8 +64,20 @@ func Init() {
 	}
 }
 
+// SmartRender automatically detects HTMX + can fall back to fragment
+func SmartRender(w http.ResponseWriter, r *http.Request, page string, fragment string, data any) {
+	isHTMX := r.Header.Get("HX-Request") == "true"
+
+	if isHTMX && fragment != "" {
+		renderFragment(w, page, fragment, data)
+		return
+	}
+
+	render(w, page, data)
+}
+
 // Render renders a full page using the cache in prod, or per-request parse in dev.
-func Render(w http.ResponseWriter, name string, data any) {
+func render(w http.ResponseWriter, name string, data any) {
 	if devMode {
 		// Dev: clone + parse page each request for hot reload
 		cl, err := baseTmpl.Clone()
@@ -98,7 +110,7 @@ func Render(w http.ResponseWriter, name string, data any) {
 
 // RenderFragment executes a named template (e.g., partial) from the cached set of a page
 // in prod, or from a per-request parsed set in dev.
-func RenderFragment(w http.ResponseWriter, pageName, tmplName string, data any) {
+func renderFragment(w http.ResponseWriter, pageName, tmplName string, data any) {
 	if devMode {
 		cl, err := baseTmpl.Clone()
 		if err != nil {
