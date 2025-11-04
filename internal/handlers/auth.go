@@ -16,7 +16,8 @@ func init() {
 
 type AuthHandler struct {
 	AuthService *services.AuthService
-	Repo        *repositories.UserRepo
+	// TODO: poossibly remove repo - overhead
+	Repo *repositories.UserRepo
 }
 
 func NewAuthHandler() *AuthHandler {
@@ -34,10 +35,11 @@ func (h *AuthHandler) RegisterPage(w http.ResponseWriter, r *http.Request) {
 		"LastName":  "",
 		"Email":     "",
 	}
-	templates.Render(w, "register", data)
+
+	templates.SmartRender(w, r, "register", "", data)
 }
 
-// Register (POST)
+// RegisterPost (POST)
 func (h *AuthHandler) RegisterPost(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -59,14 +61,14 @@ func (h *AuthHandler) RegisterPost(w http.ResponseWriter, r *http.Request) {
 
 	if first == "" || last == "" || email == "" || password == "" {
 		data["Error"] = "all fields are required"
-		h.renderRegisterResponse(w, r, data)
+		templates.SmartRender(w, r, "register", "register_form", data)
 		return
 	}
 
 	user := &models.User{FirstName: first, LastName: last, Email: email}
 	if err := h.AuthService.Register(user, password); err != nil {
 		data["Error"] = err.Error()
-		h.renderRegisterResponse(w, r, data)
+		templates.SmartRender(w, r, "register", "register_form", data)
 		return
 	}
 
@@ -77,16 +79,47 @@ func (h *AuthHandler) RegisterPost(w http.ResponseWriter, r *http.Request) {
 	data["LastName"] = ""
 	data["Email"] = email
 
-	h.renderRegisterResponse(w, r, data)
+	templates.SmartRender(w, r, "register", "register_form", data)
 }
 
-func (h *AuthHandler) renderRegisterResponse(w http.ResponseWriter, r *http.Request, data map[string]any) {
-	// If it's an HTMX request, return only the form fragment to be swapped
-	if r.Header.Get("HX-Request") == "true" {
-		// Render just the register_form template from the register page file
-		templates.RenderFragment(w, "register", "register_form", data)
+// LoginPage (GET)
+func (h *AuthHandler) LoginPage(w http.ResponseWriter, r *http.Request) {
+	templates.SmartRender(w, r, "login", "", map[string]any{"Title": "Login | FitClassMaster"})
+}
+
+// LoginPost (POST)
+func (h *AuthHandler) LoginPost(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("invalid form"))
 		return
 	}
-	// Otherwise render the full page
-	templates.Render(w, "register", data)
+
+	email := strings.TrimSpace(r.FormValue("email"))
+	password := r.FormValue("password")
+
+	data := map[string]any{
+		"Email": email,
+	}
+
+	if email == "" || password == "" {
+		data["Error"] = "all fields are required"
+		templates.SmartRender(w, r, "login", "", data)
+		return
+	}
+
+	user, err := h.AuthService.Login(email, password)
+
+	if err != nil {
+		data["Error"] = err.Error()
+		templates.SmartRender(w, r, "login", "", data)
+	}
+
+	data["Success"] = "Login successful"
+
+}
+
+// Logout (POST)
+func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
+	// TODO: implement
 }
