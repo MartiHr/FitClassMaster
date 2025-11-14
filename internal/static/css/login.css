@@ -150,10 +150,22 @@ body {
 
 .login__message--error {
     color: red;
+
+    text-shadow:
+            -0.5px -0.5px 0 #000,  /* Top-left */
+            0.5px -0.5px 0 #000,  /* Top-right */
+            -0.5px  0.5px 0 #000,  /* Bottom-left */
+            0.5px  0.5px 0 #000;  /* Bottom-right */
 }
 
 .login__message--success {
     color: rgb(0, 255, 0);
+    /* Add text-shadow for a black border/outline */
+    text-shadow:
+            -0.5px -0.5px 0 #000,  /* Top-left */
+            0.5px -0.5px 0 #000,  /* Top-right */
+            -0.5px  0.5px 0 #000,  /* Bottom-left */
+            0.5px  0.5px 0 #000;  /* Bottom-right */
 }
 
 
@@ -198,5 +210,5 @@ body {
 
 /* --------------------- Register Form --------------------- */
 #register-form {
-    padding-top: 60px;
+    padding-top: 40px;
 }

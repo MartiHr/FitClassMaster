@@ -55,13 +55,12 @@
     </form>
 {{ end }}
 
-{{ define "social_login" }}
+{{ define "social_register" }}
     <div class="social-login">
         <h3>Register via</h3>
         <div class="social-icons">
-            <a href="#" class="social-login__icon fab fa-instagram"></a>
+            <a href="#" class="social-login__icon fab fa-google"></a>
             <a href="#" class="social-login__icon fab fa-facebook"></a>
-            <a href="#" class="social-login__icon fab fa-twitter"></a>
         </div>
     </div>
 {{ end }}
@@ -72,9 +71,8 @@
             <div class="screen__content">
                 <!-- Register form -->
                 {{ template "register_form" . }}
+                {{ template "social_register" . }}
 
-                <!-- Social login buttons -->
-                {{ template "social_login" . }}
             </div>
 
             <div class="screen__background">
