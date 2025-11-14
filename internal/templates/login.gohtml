@@ -1,25 +1,69 @@
 {{ define "login_form" }}
-    <form method="POST" action="/login">
-        
-        <label>Email:</label>
-        <input type="email" name="email" value="{{ .Email }}" required><br>
+    <form method="POST" action="/login" class="login">
 
-        <label>Password:</label>
-        <input type="password" name="password" required><br>
+        <div class="login__field">
+            <i class="login__icon fas fa-user"></i>
+            <input
+                    type="email"
+                    name="email"
+                    value="{{ .Email }}"
+                    placeholder="Email"
+                    class="login__input"
+                    required
+            >
+        </div>
 
-        <button type="submit">Login</button>
+        <div class="login__field">
+            <i class="login__icon fas fa-lock"></i>
+            <input
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    class="login__input"
+                    required
+            >
+        </div>
+
+        <button type="submit" class="button login__submit">
+            <span class="button__text">Login</span>
+            <i class="button__icon fas fa-chevron-right"></i>
+        </button>
 
         {{ if .Error }}
-            <p style="color:red;">{{ .Error }}</p>
+            <p class="login__message login__message--error">{{ .Error }}</p>
         {{ end }}
         {{ if .Success }}
-            <p style="color:green;">{{ .Success }}</p>
+            <p class="login__message login__message--success">{{ .Success }}</p>
         {{ end }}
-
     </form>
 {{ end }}
 
+{{ define "social_login" }}
+    <div class="social-login">
+        <h3>Log in via</h3>
+        <div class="social-icons">
+            <a href="#" class="social-login__icon fab fa-instagram"></a>
+            <a href="#" class="social-login__icon fab fa-facebook"></a>
+            <a href="#" class="social-login__icon fab fa-twitter"></a>
+        </div>
+    </div>
+{{ end }}
+
 {{ define "content" }}
-    <h2>Login</h2>
-    {{ template "login_form" . }}
+    <div class="container">
+        <div class="screen">
+            <div class="screen__content">
+                {{ template "login_form" . }}
+                {{ template "social_login" . }}
+
+            </div>
+
+            <div class="screen__background">
+                <span class="screen__background__shape screen__background__shape4"></span>
+                <span class="screen__background__shape screen__background__shape3"></span>
+                <span class="screen__background__shape screen__background__shape2"></span>
+                <span class="screen__background__shape screen__background__shape1"></span>
+            </div>
+        </div>
+    </div>
 {{ end }}

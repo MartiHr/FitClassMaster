@@ -1,34 +1,88 @@
 {{ define "register_form" }}
-<form id="register-form"
-      hx-post="/register"
-      hx-target="#register-form"
-      hx-swap="outerHTML">
+    <form id="register-form"
+          class="login"
+          hx-post="/register"
+          hx-target="#register-form"
+          hx-swap="outerHTML">
 
-    <label>First Name:</label>
-    <input type="text" name="first_name" value="{{ .FirstName }}" required><br>
+        <div class="login__field">
+            <i class="login__icon fas fa-user"></i>
+            <input type="text" name="first_name"
+                   value="{{ .FirstName }}"
+                   placeholder="First Name"
+                   class="login__input"
+                   required>
+        </div>
 
-    <label>Last Name:</label>
-    <input type="text" name="last_name" value="{{ .LastName }}" required><br>
+        <div class="login__field">
+            <i class="login__icon fas fa-user"></i>
+            <input type="text" name="last_name"
+                   value="{{ .LastName }}"
+                   placeholder="Last Name"
+                   class="login__input"
+                   required>
+        </div>
 
-    <label>Email:</label>
-    <input type="email" name="email" value="{{ .Email }}" required><br>
+        <div class="login__field">
+            <i class="login__icon fas fa-envelope"></i>
+            <input type="email" name="email"
+                   value="{{ .Email }}"
+                   placeholder="Email"
+                   class="login__input"
+                   required>
+        </div>
 
-    <label>Password:</label>
-    <input type="password" name="password" required><br>
-    
-    <button type="submit">Register</button>
+        <div class="login__field">
+            <i class="login__icon fas fa-lock"></i>
+            <input type="password" name="password"
+                   placeholder="Password"
+                   class="login__input"
+                   required>
+        </div>
 
-    {{ if .Error }}
-        <p style="color:red;">{{ .Error }}</p>
-    {{ end }}
-    {{ if .Success }}
-        <p style="color:green;">{{ .Success }}</p>
-    {{ end }}
+        <button type="submit" class="button login__submit">
+            <span class="button__text">Register</span>
+            <i class="button__icon fas fa-chevron-right"></i>
+        </button>
 
-</form>
+        {{ if .Error }}
+            <p class="login__message login__message--error">{{ .Error }}</p>
+        {{ end }}
+        {{ if .Success }}
+            <p class="login__message login__message--success">{{ .Success }}</p>
+        {{ end }}
+
+    </form>
+{{ end }}
+
+{{ define "social_login" }}
+    <div class="social-login">
+        <h3>Register via</h3>
+        <div class="social-icons">
+            <a href="#" class="social-login__icon fab fa-instagram"></a>
+            <a href="#" class="social-login__icon fab fa-facebook"></a>
+            <a href="#" class="social-login__icon fab fa-twitter"></a>
+        </div>
+    </div>
 {{ end }}
 
 {{ define "content" }}
-    <h2>Register</h2>
-    {{ template "register_form" . }}
+    <div class="container">
+        <div class="screen">
+            <div class="screen__content">
+                <!-- Register form -->
+                {{ template "register_form" . }}
+
+                <!-- Social login buttons -->
+                {{ template "social_login" . }}
+            </div>
+
+            <div class="screen__background">
+                <span class="screen__background__shape screen__background__shape4"></span>
+                <span class="screen__background__shape screen__background__shape3"></span>
+                <span class="screen__background__shape screen__background__shape2"></span>
+                <span class="screen__background__shape screen__background__shape1"></span>
+            </div>
+        </div>
+    </div>
 {{ end }}

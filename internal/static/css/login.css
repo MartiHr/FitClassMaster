@@ -1,0 +1,202 @@
+/* TODO: extract general styles to a separate file (main.css) */
+
+@import url('https://fonts.googleapis.com/css?family=Raleway:400,700');
+
+/* --------------------- Base Reset --------------------- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Raleway, sans-serif;
+}
+
+body {
+    background: linear-gradient(90deg, #C7C5F4, #776BCC);
+}
+
+/* --------------------- Layout Wrapper --------------------- */
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* --------------------- Card Layout --------------------- */
+.screen {
+    background: linear-gradient(90deg, #5D54A4, #7C78B8);
+    position: relative;
+    height: 600px;
+    width: 360px;
+    box-shadow: 0px 0px 24px #5C5696;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.screen__content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+}
+
+.screen__background {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 1;
+}
+
+/* Background Shapes */
+.screen__background__shape {
+    transform: rotate(45deg);
+    position: absolute;
+    border-radius: 32px;
+}
+
+.screen__background__shape1 {
+    height: 520px; width: 520px;
+    background: #FFF;
+    top: -50px; right: 120px;
+    border-radius: 0 72px 0 0;
+}
+
+.screen__background__shape2 {
+    height: 220px; width: 220px;
+    background: #6C63AC;
+    top: -172px; right: 0;
+}
+
+.screen__background__shape3 {
+    height: 540px; width: 190px;
+    background: linear-gradient(270deg, #5D54A4, #6A679E);
+    top: -24px; right: 0;
+}
+
+.screen__background__shape4 {
+    height: 400px; width: 200px;
+    background: #7E7BB9;
+    top: 420px; right: 50px;
+}
+
+/* --------------------- Login Form --------------------- */
+.login {
+    width: 300px;
+    padding: 30px;
+    padding-top: 160px;
+}
+
+.login__field {
+    padding: 20px 0;
+    position: relative;
+}
+
+.login__icon {
+    position: absolute;
+    top: 32px;
+    left: 0;
+    color: #7875B5;
+    font-size: 18px;
+}
+
+.login__input {
+    border: none;
+    border-bottom: 2px solid #D1D1D4;
+    background: transparent;
+    padding: 10px;
+    padding-left: 26px;
+    width: 80%;
+    font-weight: 700;
+    transition: 0.2s;
+}
+
+.login__input:focus {
+    outline: none;
+    border-bottom-color: #6A679E;
+}
+
+/* --------------------- Submit Button --------------------- */
+.login__submit {
+    background: #fff;
+    border: 1px solid #D4D3E8;
+    padding: 16px 20px;
+    border-radius: 26px;
+    text-transform: uppercase;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    color: #4C489D;
+    margin-top: 30px;
+    box-shadow: 0px 2px 2px #5C5696;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.login__submit:hover {
+    border-color: #6A679E;
+}
+
+.button__icon {
+    margin-left: auto;
+    font-size: 20px;
+    color: #7875B5;
+}
+
+/* --------------------- Messages --------------------- */
+.login__message {
+    margin-top: 10px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.login__message--error {
+    color: red;
+}
+
+.login__message--success {
+    color: rgb(0, 255, 0);
+}
+
+
+/* --------------------- Login Social Media --------------------- */
+
+.social-login {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    height: 140px;
+    width: 160px;
+    text-align: center;
+    color: #fff;
+}
+
+.social-login h3 {
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.social-icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.social-login__icon {
+    padding: 15px;
+    font-size: 20px;
+    color: #fff;
+    text-decoration: none;
+    text-shadow: 0px 0px 8px #7875B5;
+    transition: transform 0.2s ease;
+}
+
+.social-login__icon:hover {
+    transform: scale(1.4);
+}
+
+
+/* --------------------- Register Form --------------------- */
+#register-form {
+    padding-top: 60px;
+}
