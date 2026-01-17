@@ -15,7 +15,7 @@ func RequireRole(allowedRoles ...models.Role) func(http.Handler) http.Handler {
 			// Check if the user's role is in the 'allowed' slice
 			isAllowed := false
 			for _, role := range allowedRoles {
-				if ok && userRole == string(role) {
+				if ok && userRole == role {
 					isAllowed = true
 					break
 				}

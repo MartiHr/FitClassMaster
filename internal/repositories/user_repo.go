@@ -15,7 +15,7 @@ func (r *UserRepo) Create(u *models.User) error {
 	return config.DB.Create(u).Error
 }
 
-func (r *UserRepo) GetById(id int) (user *models.User, err error) {
+func (r *UserRepo) GetById(id uint) (user *models.User, err error) {
 	var u models.User
 
 	if err := config.DB.First(&u, id).Error; err != nil {

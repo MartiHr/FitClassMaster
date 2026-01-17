@@ -152,10 +152,10 @@ body {
     color: red;
 
     text-shadow:
-            -0.5px -0.5px 0 #000,  /* Top-left */
-            0.5px -0.5px 0 #000,  /* Top-right */
-            -0.5px  0.5px 0 #000,  /* Bottom-left */
-            0.5px  0.5px 0 #000;  /* Bottom-right */
+            -1px -1px 0 #000,  /* Top-left */
+            1px -1px 0 #000,  /* Top-right */
+            -1px  1px 0 #000,  /* Bottom-left */
+            1px  1px 0 #000;  /* Bottom-right */
 }
 
 .login__message--success {

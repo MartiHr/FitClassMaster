@@ -20,3 +20,8 @@ type User struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+// Helpers for role checking
+func (u *User) IsMember() bool  { return u.Role == RoleMember }
+func (u *User) IsAdmin() bool   { return u.Role == RoleAdmin }
+func (u *User) IsTrainer() bool { return u.Role == RoleTrainer }

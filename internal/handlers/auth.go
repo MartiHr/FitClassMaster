@@ -3,7 +3,6 @@ package handlers
 import (
 	"FitClassMaster/internal/auth"
 	"FitClassMaster/internal/models"
-	"FitClassMaster/internal/repositories"
 	"FitClassMaster/internal/services"
 	"FitClassMaster/internal/templates"
 	"net/http"
@@ -12,15 +11,10 @@ import (
 
 type AuthHandler struct {
 	AuthService *services.AuthService
-	// TODO: poossibly remove repo - overhead
-	Repo *repositories.UserRepo
 }
 
-func NewAuthHandler() *AuthHandler {
-	repo := repositories.NewUserRepo()
-	authService := services.NewAuthService(repo)
-
-	return &AuthHandler{AuthService: authService, Repo: repo}
+func NewAuthHandler(authService *services.AuthService) *AuthHandler {
+	return &AuthHandler{AuthService: authService}
 }
 
 // RegisterPage (GET)
@@ -112,25 +106,13 @@ func (h *AuthHandler) LoginPost(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.AuthService.Login(email, password)
 	if err != nil {
-		data["Error"] = err.Error()
+		data["Error"] = "Invalid credentials"
 		templates.SmartRender(w, r, "login", "", data)
 		return
 	}
 
 	// Save user ID in session
-	if err := auth.SaveUserSession(w, r, user.ID); err != nil {
-		http.Error(w, "session error", http.StatusInternalServerError)
-		return
-	}
-
-	// Save user role in session
-	if err := auth.SaveUserRole(w, r, string(user.Role)); err != nil {
-		http.Error(w, "session error", http.StatusInternalServerError)
-		return
-	}
-
-	// Save email and derived username for quick access in templates
-	if err := auth.SaveUserMeta(w, r, user.Email); err != nil {
+	if err := auth.SaveUserSession(w, r, user); err != nil {
 		http.Error(w, "session error", http.StatusInternalServerError)
 		return
 	}

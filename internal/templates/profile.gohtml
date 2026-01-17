@@ -1,0 +1,9 @@
+{{ define "content" }}
+    <div class="profile-container">
+        <h2>My Profile</h2>
+        <p><strong>First Name:</strong> {{ .User.FirstName }}</p>
+        <p><strong>Last Name:</strong> {{ .User.LastName }}</p>
+        <p><strong>Email:</strong> {{ .User.Email }}</p>
+        <p><strong>Account Type:</strong> {{ .User.Role }}</p>
+    </div>
+{{ end }}

@@ -2,79 +2,96 @@ package auth
 
 import (
 	"FitClassMaster/internal/config"
+	"FitClassMaster/internal/models"
 	"net/http"
 	"strings"
+
+	"github.com/gorilla/sessions"
 )
 
-const SessionName = "app_session"
-const SessionUserIDKey = "user_id"
-const SessionUserEmailKey = "user_email"
-const SessionUsernameKey = "username"
-const SessionUserRoleKey = "user_role"
+const (
+	SessionName         = "app_session"
+	SessionUserIDKey    = "user_id"
+	SessionUserEmailKey = "user_email"
+	SessionUsernameKey  = "username"
+	SessionUserRoleKey  = "user_role"
+)
 
-// SaveUserSession stores the authenticated user's ID (uint) into the session.
-func SaveUserSession(w http.ResponseWriter, r *http.Request, userID uint) error {
+func SaveUserSession(w http.ResponseWriter, r *http.Request, user *models.User) error {
+	// Open session once
 	session, _ := config.Store.Get(r, SessionName)
-	session.Values[SessionUserIDKey] = userID
+
+	// Use helpers to populate the session object (No encryption/saving happens yet)
+	SetUserID(session, user.ID)
+	SetUserMeta(session, user.Email)
+	SetUserRole(session, user.Role)
+
+	// Encrypt and Write Header ONCE
 	return session.Save(r, w)
 }
 
-// SaveUserMeta stores email and derived username into the session.
-func SaveUserMeta(w http.ResponseWriter, r *http.Request, email string) error {
-	session, _ := config.Store.Get(r, SessionName)
+func SetUserID(session *sessions.Session, userID uint) {
+	session.Values[SessionUserIDKey] = userID
+}
+
+func SetUserMeta(session *sessions.Session, email string) {
 	session.Values[SessionUserEmailKey] = email
 	username := email
 	if at := strings.Index(email, "@"); at > 0 {
 		username = email[:at]
 	}
 	session.Values[SessionUsernameKey] = username
-	return session.Save(r, w)
 }
 
-// ClearUserSession removes all user-related info from the session and persists the change.
+func SetUserRole(session *sessions.Session, role models.Role) {
+	session.Values[SessionUserRoleKey] = string(role)
+}
+
 func ClearUserSession(w http.ResponseWriter, r *http.Request) error {
 	session, _ := config.Store.Get(r, SessionName)
+
 	delete(session.Values, SessionUserIDKey)
 	delete(session.Values, SessionUserEmailKey)
 	delete(session.Values, SessionUsernameKey)
+	delete(session.Values, SessionUserRoleKey)
+
+	session.Options.MaxAge = -1
 	return session.Save(r, w)
 }
 
-// GetUserIDFromSession retrieves the user ID from session as uint.
 func GetUserIDFromSession(r *http.Request) (uint, bool) {
 	session, _ := config.Store.Get(r, SessionName)
-	userID, ok := session.Values[SessionUserIDKey].(uint)
-	return userID, ok
+	val := session.Values[SessionUserIDKey]
+
+	switch v := val.(type) {
+	case uint:
+		return v, true
+	case int:
+		return uint(v), true
+	default:
+		return 0, false
+	}
 }
 
-// GetUserEmailFromSession retrieves the user's email from the session.
 func GetUserEmailFromSession(r *http.Request) (string, bool) {
 	session, _ := config.Store.Get(r, SessionName)
 	email, ok := session.Values[SessionUserEmailKey].(string)
 	return email, ok
 }
 
-// GetUsernameFromSession retrieves the username (email prefix) from the session.
 func GetUsernameFromSession(r *http.Request) (string, bool) {
 	session, _ := config.Store.Get(r, SessionName)
 	username, ok := session.Values[SessionUsernameKey].(string)
 	return username, ok
 }
 
-// IsAuthenticated returns true if a user ID is present in the session.
+func GetUserRoleFromSession(r *http.Request) (models.Role, bool) {
+	session, _ := config.Store.Get(r, SessionName)
+	val, ok := session.Values[SessionUserRoleKey].(string)
+	return models.Role(val), ok
+}
+
 func IsAuthenticated(r *http.Request) bool {
 	_, ok := GetUserIDFromSession(r)
 	return ok
-}
-
-func SaveUserRole(w http.ResponseWriter, r *http.Request, role string) error {
-	session, _ := config.Store.Get(r, SessionName)
-	session.Values[SessionUserRoleKey] = role
-	return session.Save(r, w)
-}
-
-func GetUserRoleFromSession(r *http.Request) (string, bool) {
-	session, _ := config.Store.Get(r, SessionName)
-	role, ok := session.Values[SessionUserRoleKey].(string)
-	return role, ok
 }

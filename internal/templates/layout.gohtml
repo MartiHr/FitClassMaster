@@ -1,35 +1,36 @@
 {{ define "layout" }}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ .Title }}</title>
-    <script src="/static/js/htmx.min.js"></script>
-    <link rel="stylesheet" href="/static/css/main.css">
-    <link rel="stylesheet" href="/static/css/login.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>{{ .Title }}</title>
+        <script src="/static/js/htmx.min.js"></script>
+        <link rel="stylesheet" href="/static/css/main.css">
+        <link rel="stylesheet" href="/static/css/login.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
-</head>
-<body>
-<header>
-    <nav>
-        <a href="/">Home</a>
-        {{ if .IsAuthenticated }}
-            <span>Hi, {{ .Username }}</span>
-            <form method="POST" action="/logout" style="display:inline;">
-                <button type="submit">Logout</button>
-            </form>
-        {{ else }}
-            <a href="/register">Register</a>
-            <a href="/login">Login</a>
-        {{ end }}   
-    </nav>
-</header>
+    </head>
+    <body>
+    <header>
+        <nav>
+            <a href="/">Home</a>
+            {{ if .IsAuthenticated }}
+                <a href="/profile">Profile</a>
+                <span>Hi, {{ .Username }}</span>
+                <form method="POST" action="/logout" style="display:inline;">
+                    <button type="submit">Logout</button>
+                </form>
+            {{ else }}
+                <a href="/register">Register</a>
+                <a href="/login">Login</a>
+            {{ end }}
+        </nav>
+    </header>
 
-<main>
-    {{ block "content" . }}{{ end }}
-</main>
-</body>
-</html>
+    <main>
+        {{ block "content" . }}{{ end }}
+    </main>
+    </body>
+    </html>
 {{ end }}

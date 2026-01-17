@@ -5,6 +5,8 @@ import (
 	"FitClassMaster/internal/handlers"
 	"FitClassMaster/internal/middlewares"
 	"FitClassMaster/internal/models"
+	"FitClassMaster/internal/repositories"
+	"FitClassMaster/internal/services"
 	"FitClassMaster/internal/templates"
 
 	"log"
@@ -39,8 +41,16 @@ func main() {
 	fileServer := http.FileServer(http.Dir("internal/static"))
 	r.Handle("/static/*", http.StripPrefix("/static/", fileServer))
 
+	// Repositories
+	userRepo := repositories.NewUserRepo()
+
+	// Services
+	authService := services.NewAuthService(userRepo)
+	userService := services.NewUserService(userRepo)
+
 	// Handlers
-	authH := handlers.NewAuthHandler()
+	authH := handlers.NewAuthHandler(authService)
+	userH := handlers.NewUserHandler(userService)
 
 	homeH := handlers.NewHomeHandler()
 	dashboardH := handlers.NewDashboardHandler()
@@ -57,13 +67,14 @@ func main() {
 
 	// Member tier (Any Logged-in User)
 	// Protected routes
-
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.RequireAuth)
 		r.Use(middlewares.RequireRole(models.RoleMember, models.RoleTrainer, models.RoleAdmin))
 
-		r.Get("/dashboard", dashboardH.Dashboard)
 		r.Post("/logout", authH.Logout)
+
+		r.Get("/dashboard", dashboardH.Dashboard)
+		r.Get("/profile", userH.ProfilePage)
 	})
 
 	// Staff tier (Trainer or Admin)
