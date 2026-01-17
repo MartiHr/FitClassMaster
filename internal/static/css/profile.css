@@ -1,0 +1,92 @@
+/* internal/static/css/profile.css */
+.profile-container {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.profile-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 500px;
+}
+
+.profile-card h1 {
+    margin-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-group input:disabled {
+    background-color: #f5f5f5;
+    color: #888;
+}
+
+.btn-save {
+    background-color: #1a1a1a;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold;
+}
+
+.btn-save:hover {
+    background-color: #ff4d4d;
+}
+
+/* Styling for the Password Section Heading */
+.password-section h2 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+    color: #1a1a1a;
+}
+
+/* Horizontal Divider styling */
+hr {
+    margin: 2rem 0;
+    border: 0;
+    border-top: 1px solid #eee;
+}
+
+/* Status Messages (Success/Error) */
+#response-msg, #password-msg {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* These will be useful when we return specific colors from the Go backend */
+.text-success {
+    color: #27ae60;
+    background-color: #eafaf1;
+}
+
+.text-error {
+    color: #c0392b;
+    background-color: #fdeaea;
+}
