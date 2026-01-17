@@ -1,0 +1,86 @@
+/* Navigation Container */
+/*header {*/
+/*    background-color: #1a1a1a;*/
+/*    color: #ffffff;*/
+/*    padding: 0.75rem 0;*/
+/*    width: 100%;*/
+/*    height: 10%;*/
+/*    position: sticky;*/
+/*    top: 0;*/
+/*    z-index: 1000;*/
+/*}*/
+
+header {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 1.25rem 0; /* Increased from 0.75rem to make it taller */
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* Links and Branding */
+/*nav a {*/
+/*    color: #ecf0f1;*/
+/*    text-decoration: none;*/
+/*    font-weight: 500;*/
+/*    transition: color 0.2s;*/
+/*}*/
+
+nav a {
+    color: #ecf0f1;
+    text-decoration: none;
+    font-size: 1.1rem; /* Makes the text bigger */
+    font-weight: 700;   /* Makes the text bold */
+    transition: color 0.2s;
+    text-transform: uppercase; /* Optional: gives a modern 'gym' feel */
+    letter-spacing: 0.5px;      /* Optional: improves readability of bold text */
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem; /* Adds space between each navigation link */
+}
+
+nav a:hover {
+    color: #ff4d4d;
+}
+
+/* Auth Section Styling */
+.auth-group {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.username-display {
+    color: #ff4d4d;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+/* Logout Button */
+nav button {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+nav button:hover {
+    opacity: 0.9;
+}

@@ -1,0 +1,49 @@
+footer {
+    background-color: #1a1a1a;
+    color: #ecf0f1;
+    padding: 3rem 0 1rem 0;
+    margin-top: 4rem; /* Pushes footer away from page content */
+    border-top: 3px solid #ff4d4d; /* Matches the Gym Red theme */
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.footer-section h3 {
+    color: #ff4d4d;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: right;
+}
+
+.footer-links a {
+    color: #bdc3c7;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-links a:hover {
+    color: #ffffff;
+}
+
+.footer-bottom {
+    grid-column: 1 / span 2;
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #333;
+    font-size: 0.8rem;
+    color: #7f8c8d;
+}
