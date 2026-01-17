@@ -65,7 +65,7 @@ func main() {
 		r.Post("/login", authH.LoginPost)
 	})
 
-	// Member tier (Any Logged-in User)
+	// Member tier (Any Logged-in User to start with)
 	// Protected routes
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.RequireAuth)
@@ -75,6 +75,7 @@ func main() {
 
 		r.Get("/dashboard", dashboardH.Dashboard)
 		r.Get("/profile", userH.ProfilePage)
+		//r.Post("/profile/update", userH.UpdateProfile)
 	})
 
 	// Staff tier (Trainer or Admin)
@@ -92,6 +93,7 @@ func main() {
 
 		// r.Get("/admin/users", adminH.ManageUsers)
 		// r.Get("/admin", adminHandler)
+
 	})
 
 	// Run server

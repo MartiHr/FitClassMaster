@@ -44,3 +44,18 @@ func (r *UserRepo) GetByName(name string) (user *models.User, err error) {
 
 	return &u, nil
 }
+
+// UpdateInfo updates the first and last name of a user
+func (r *UserRepo) UpdateInfo(id uint, firstName, lastName string) error {
+	// Change r.DB to config.DB
+	return config.DB.Model(&models.User{}).Where("id = ?", id).Updates(map[string]interface{}{
+		"first_name": firstName,
+		"last_name":  lastName,
+	}).Error
+}
+
+// UpdatePassword updates the hashed password in the database
+func (r *UserRepo) UpdatePassword(id uint, hashedPwd string) error {
+	// Change r.DB to config.DB
+	return config.DB.Model(&models.User{}).Where("id = ?", id).Update("password", hashedPwd).Error
+}

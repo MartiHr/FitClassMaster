@@ -3,6 +3,9 @@ package services
 import (
 	"FitClassMaster/internal/models"
 	"FitClassMaster/internal/repositories"
+	"errors"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService struct {
@@ -14,6 +17,27 @@ func NewUserService(repo *repositories.UserRepo) *UserService {
 }
 
 func (s *UserService) GetProfile(id uint) (*models.User, error) {
-	// You could add logic here later, like checking if account is active
 	return s.Repo.GetById(id)
+}
+
+func (s *UserService) UpdateProfile(id uint, firstName, lastName string) error {
+	return s.Repo.UpdateInfo(id, firstName, lastName)
+}
+
+func (s *UserService) ChangePassword(userID uint, currentPwd, newPwd string) error {
+	user, err := s.Repo.GetById(userID)
+	if err != nil {
+		return err
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(currentPwd)); err != nil {
+		return errors.New("Current password is incorrect")
+	}
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(newPwd), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	return s.Repo.UpdatePassword(userID, string(hash))
 }
