@@ -10,6 +10,7 @@
         <link rel="stylesheet" href="/static/css/footer.css">
         <link rel="stylesheet" href="/static/css/login.css">
         <link rel="stylesheet" href="/static/css/profile.css">
+        <link rel="stylesheet" href="/static/css/about.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
@@ -20,11 +21,11 @@
             <a href="/">FitClassMaster</a>
             <div class="nav-links">
                 <a href="/">Home</a>
-                <a href="/about">About</a>
                 {{ if .IsAuthenticated }}
                     <a href="/classes">Classes</a>
                     <a href="/profile">Profile</a>
                 {{ end }}
+                <a href="/about">About</a>
             </div>
 
             <div class="auth-section auth-group">

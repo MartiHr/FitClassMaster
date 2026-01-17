@@ -53,6 +53,7 @@ func main() {
 	userH := handlers.NewUserHandler(userService)
 
 	homeH := handlers.NewHomeHandler()
+	aboutH := handlers.NewAboutHandler()
 	dashboardH := handlers.NewDashboardHandler()
 
 	// Public routes
@@ -63,6 +64,7 @@ func main() {
 		r.Post("/register", authH.RegisterPost)
 		r.Get("/login", authH.LoginPage)
 		r.Post("/login", authH.LoginPost)
+		r.Get("/about", aboutH.About)
 	})
 
 	// Member tier (Any Logged-in User to start with)

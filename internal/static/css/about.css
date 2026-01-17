@@ -1,0 +1,30 @@
+.static-container {
+    max-width: 800px;
+    margin: 4rem auto;
+    padding: 0 2rem;
+    line-height: 1.6;
+}
+
+.static-content h1 {
+    color: #ff4d4d;
+
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+
+    text-shadow:
+            -0.5px -0.5px 0 #000,  /* Top-left */
+            0.5px -0.5px 0 #000,  /* Top-right */
+            -0.5px  0.5px 0 #000,  /* Bottom-left */
+            0.5px  0.5px 0 #000;  /* Bottom-right */
+}
+
+.static-content .lead {
+    font-size: 1.25rem;
+    color: #555;
+    margin-bottom: 2rem;
+}
+
+.static-content h2 {
+    margin-top: 2rem;
+    color: #1a1a1a;
+}
