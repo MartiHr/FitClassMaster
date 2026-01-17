@@ -40,8 +40,10 @@ func main() {
 	r.Handle("/static/*", http.StripPrefix("/static/", fileServer))
 
 	// Handlers
-	homeH := handlers.NewHomeHandler()
 	authH := handlers.NewAuthHandler()
+
+	homeH := handlers.NewHomeHandler()
+	dashboardH := handlers.NewDashboardHandler()
 
 	// Public routes
 	r.Get("/", homeH.Home)
@@ -53,9 +55,7 @@ func main() {
 	r.Post("/logout", authH.Logout)
 
 	// Protected example route
-	r.With(middlewares.RequireAuth).Get("/dashboard", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Welcome to your dashboard!"))
-	})
+	r.With(middlewares.RequireAuth).Get("/dashboard", dashboardH.Dashboard)
 
 	// Run server
 	log.Println("✅ Server running at http://localhost:8080")
