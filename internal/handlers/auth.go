@@ -132,5 +132,5 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	// Clear the user session using auth helpers
 	_ = auth.ClearUserSession(w, r)
 	// Redirect to login
-	http.Redirect(w, r, "/login", http.StatusSeeOther)
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
