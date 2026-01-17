@@ -56,6 +56,5 @@ func (r *UserRepo) UpdateInfo(id uint, firstName, lastName string) error {
 
 // UpdatePassword updates the hashed password in the database
 func (r *UserRepo) UpdatePassword(id uint, hashedPwd string) error {
-	// Change r.DB to config.DB
 	return config.DB.Model(&models.User{}).Where("id = ?", id).Update("password", hashedPwd).Error
 }

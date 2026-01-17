@@ -75,7 +75,8 @@ func main() {
 
 		r.Get("/dashboard", dashboardH.Dashboard)
 		r.Get("/profile", userH.ProfilePage)
-		//r.Post("/profile/update", userH.UpdateProfile)
+		r.Post("/profile/update", userH.UpdateProfile)
+		r.Post("/profile/update-password", userH.UpdatePassword)
 	})
 
 	// Staff tier (Trainer or Admin)
