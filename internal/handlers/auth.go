@@ -61,7 +61,13 @@ func (h *AuthHandler) RegisterPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := &models.User{FirstName: first, LastName: last, Email: email}
+	user := &models.User{
+		FirstName: first,
+		LastName:  last,
+		Email:     email,
+		Role:      models.RoleMember,
+	}
+
 	if err := h.AuthService.Register(user, password); err != nil {
 		data["Error"] = err.Error()
 		templates.SmartRender(w, r, "register", "register_form", data)
@@ -111,10 +117,18 @@ func (h *AuthHandler) LoginPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Save user ID in session
 	if err := auth.SaveUserSession(w, r, user.ID); err != nil {
 		http.Error(w, "session error", http.StatusInternalServerError)
 		return
 	}
+
+	// Save user role in session
+	if err := auth.SaveUserRole(w, r, string(user.Role)); err != nil {
+		http.Error(w, "session error", http.StatusInternalServerError)
+		return
+	}
+
 	// Save email and derived username for quick access in templates
 	if err := auth.SaveUserMeta(w, r, user.Email); err != nil {
 		http.Error(w, "session error", http.StatusInternalServerError)

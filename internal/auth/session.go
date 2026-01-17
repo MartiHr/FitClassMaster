@@ -10,6 +10,7 @@ const SessionName = "app_session"
 const SessionUserIDKey = "user_id"
 const SessionUserEmailKey = "user_email"
 const SessionUsernameKey = "username"
+const SessionUserRoleKey = "user_role"
 
 // SaveUserSession stores the authenticated user's ID (uint) into the session.
 func SaveUserSession(w http.ResponseWriter, r *http.Request, userID uint) error {
@@ -64,4 +65,16 @@ func GetUsernameFromSession(r *http.Request) (string, bool) {
 func IsAuthenticated(r *http.Request) bool {
 	_, ok := GetUserIDFromSession(r)
 	return ok
+}
+
+func SaveUserRole(w http.ResponseWriter, r *http.Request, role string) error {
+	session, _ := config.Store.Get(r, SessionName)
+	session.Values[SessionUserRoleKey] = role
+	return session.Save(r, w)
+}
+
+func GetUserRoleFromSession(r *http.Request) (string, bool) {
+	session, _ := config.Store.Get(r, SessionName)
+	role, ok := session.Values[SessionUserRoleKey].(string)
+	return role, ok
 }

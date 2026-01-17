@@ -46,16 +46,42 @@ func main() {
 	dashboardH := handlers.NewDashboardHandler()
 
 	// Public routes
-	r.Get("/", homeH.Home)
-	r.Get("/htmx/hello", homeH.HelloHtmx)
-	r.Get("/register", authH.RegisterPage)
-	r.Post("/register", authH.RegisterPost)
-	r.Get("/login", authH.LoginPage)
-	r.Post("/login", authH.LoginPost)
-	r.Post("/logout", authH.Logout)
+	r.Group(func(r chi.Router) {
+		r.Get("/", homeH.Home)
+		r.Get("/htmx/hello", homeH.HelloHtmx)
+		r.Get("/register", authH.RegisterPage)
+		r.Post("/register", authH.RegisterPost)
+		r.Get("/login", authH.LoginPage)
+		r.Post("/login", authH.LoginPost)
+	})
 
-	// Protected example route
-	r.With(middlewares.RequireAuth).Get("/dashboard", dashboardH.Dashboard)
+	// Member tier (Any Logged-in User)
+	// Protected routes
+
+	r.Group(func(r chi.Router) {
+		r.Use(middlewares.RequireAuth)
+		r.Use(middlewares.RequireRole(models.RoleMember, models.RoleTrainer, models.RoleAdmin))
+
+		r.Get("/dashboard", dashboardH.Dashboard)
+		r.Post("/logout", authH.Logout)
+	})
+
+	// Staff tier (Trainer or Admin)
+	r.Group(func(r chi.Router) {
+		r.Use(middlewares.RequireAuth)
+		r.Use(middlewares.RequireRole(models.RoleTrainer, models.RoleAdmin))
+
+		// r.Get("/manage-programs", programH.List)
+	})
+
+	// Admin tier (Admin Only)
+	r.Group(func(r chi.Router) {
+		r.Use(middlewares.RequireAuth)
+		r.Use(middlewares.RequireRole(models.RoleAdmin))
+
+		// r.Get("/admin/users", adminH.ManageUsers)
+		// r.Get("/admin", adminHandler)
+	})
 
 	// Run server
 	log.Println("✅ Server running at http://localhost:8080")
