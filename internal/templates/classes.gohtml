@@ -10,23 +10,30 @@
                 <div class="class-card">
                     <div class="class-card__header">
                         <i class="fas fa-dumbbell"></i>
-                        <h3>{{ .Name }}</h3>
+                        <h3>{{ .Class.Name }}</h3>
                     </div>
                     <div class="class-card__body">
-                        <p>{{ .Description }}</p>
+                        <p>{{ .Class.Description }}</p>
                         <ul class="class-info">
-                            <li><i class="far fa-clock"></i> {{ .StartTime.Format "Mon, Jan 02 at 15:04" }}</li>
-                            <li><i class="fas fa-hourglass-half"></i> {{ .Duration }} Minutes</li>
-                            <li><i class="fas fa-users"></i> Capacity: {{ .MaxCapacity }}</li>
+                            <li><i class="far fa-clock"></i> {{ .Class.StartTime.Format "Mon, Jan 02 at 15:04" }}</li>
+                            <li><i class="fas fa-hourglass-half"></i> {{ .Class.Duration }} Minutes</li>
+                            <li><i class="fas fa-users"></i> Capacity: {{ .Class.MaxCapacity }}</li>
                         </ul>
                     </div>
-                    <div class="class-card__footer">
-                        {{ if $.IsAuthenticated }}
-                            <button class="btn-enroll" hx-post="/api/enrollments" hx-vals='{"class_id": "{{ .ID }}"}'>
-                                Enroll Now
+
+                    <div class="class-card__footer" id="enroll-section-{{ .Class.ID }}">
+                        {{ if .IsEnrolled }}
+                            <button class="btn-enroll" style="background-color: #28a745; cursor: default;" disabled>
+                                <i class="fas fa-check"></i> Enrolled
                             </button>
                         {{ else }}
-                            <a href="/login" class="btn-login-to-enroll">Login to Join</a>
+                            <button class="btn-enroll"
+                                    hx-post="/api/enrollments"
+                                    hx-vals='{"class_id": "{{ .Class.ID }}"}'
+                                    hx-target="#enroll-section-{{ .Class.ID }}"
+                                    hx-swap="outerHTML">
+                                Enroll Now
+                            </button>
                         {{ end }}
                     </div>
                 </div>

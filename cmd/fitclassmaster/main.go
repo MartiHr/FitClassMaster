@@ -27,7 +27,8 @@ func main() {
 	// Auto migrate
 	if err := config.DB.AutoMigrate(
 		&models.User{},
-		&models.Class{}); err != nil {
+		&models.Class{},
+		&models.Enrollment{}); err != nil {
 		log.Fatalf("Migration failed: %v", err)
 	}
 
@@ -46,16 +47,19 @@ func main() {
 	// Repositories
 	userRepo := repositories.NewUserRepo()
 	classRepo := repositories.NewClassRepo()
+	enrollRepo := repositories.NewEnrollmentRepo()
 
 	// Services
 	authService := services.NewAuthService(userRepo)
 	userService := services.NewUserService(userRepo)
 	classService := services.NewClassService(classRepo)
+	enrollService := services.NewEnrollmentService(enrollRepo, classRepo)
 
 	// Handlers
 	authH := handlers.NewAuthHandler(authService)
 	userH := handlers.NewUserHandler(userService)
 	classH := handlers.NewClassHandler(classService)
+	enrollH := handlers.NewEnrollmentHandler(enrollService)
 
 	homeH := handlers.NewHomeHandler()
 	aboutH := handlers.NewAboutHandler()
@@ -86,6 +90,7 @@ func main() {
 		r.Post("/profile/update", userH.UpdateProfile)
 		r.Post("/profile/update-password", userH.UpdatePassword)
 		r.Get("/classes", classH.ClassesPage)
+		r.Post("/api/enrollments", enrollH.Enroll)
 	})
 
 	// Staff tier (Trainer or Admin)
