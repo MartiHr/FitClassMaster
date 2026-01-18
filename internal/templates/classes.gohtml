@@ -1,0 +1,38 @@
+{{ define "content" }}
+    <div class="classes-container">
+        <div class="classes-header">
+            <h1><i class="fas fa-calendar-alt"></i> Available Classes</h1>
+            <p>Browse our current schedule and book your next session.</p>
+        </div>
+
+        <div class="class-grid">
+            {{ range .Classes }}
+                <div class="class-card">
+                    <div class="class-card__header">
+                        <i class="fas fa-dumbbell"></i>
+                        <h3>{{ .Name }}</h3>
+                    </div>
+                    <div class="class-card__body">
+                        <p>{{ .Description }}</p>
+                        <ul class="class-info">
+                            <li><i class="far fa-clock"></i> {{ .StartTime.Format "Mon, Jan 02 at 15:04" }}</li>
+                            <li><i class="fas fa-hourglass-half"></i> {{ .Duration }} Minutes</li>
+                            <li><i class="fas fa-users"></i> Capacity: {{ .MaxCapacity }}</li>
+                        </ul>
+                    </div>
+                    <div class="class-card__footer">
+                        {{ if $.IsAuthenticated }}
+                            <button class="btn-enroll" hx-post="/api/enrollments" hx-vals='{"class_id": "{{ .ID }}"}'>
+                                Enroll Now
+                            </button>
+                        {{ else }}
+                            <a href="/login" class="btn-login-to-enroll">Login to Join</a>
+                        {{ end }}
+                    </div>
+                </div>
+            {{ else }}
+                <p class="no-classes">No classes are currently scheduled. Check back later!</p>
+            {{ end }}
+        </div>
+    </div>
+{{ end }}

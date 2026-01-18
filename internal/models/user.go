@@ -11,7 +11,7 @@ const (
 )
 
 type User struct {
-	ID        uint   `gorm:"primaryKey"`
+	ID        uint   `gorm:"primaryKey;autoIncrement;column:id"`
 	FirstName string `gorm:"size:64"`
 	LastName  string `gorm:"size:64"`
 	Email     string `gorm:"size:255;uniqueIndex;not null"`

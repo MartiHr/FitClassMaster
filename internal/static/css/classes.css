@@ -1,0 +1,73 @@
+.classes-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.classes-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.classes-header h1 {
+    font-size: 2.5rem;
+    color: #1a1a1a;
+}
+
+.class-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.class-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.class-card__header {
+    background: #ff4d4d;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.class-card__body {
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.class-info {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+}
+
+.class-info li {
+    margin-bottom: 8px;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.class-info i {
+    width: 20px;
+    color: #ff4d4d;
+}
+
+.btn-enroll {
+    width: 100%;
+    padding: 12px;
+    background: #1a1a1a;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-enroll:hover {
+    background: #ff4d4d;
+}

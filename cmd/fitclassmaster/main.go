@@ -25,7 +25,9 @@ func main() {
 	templates.Init()
 
 	// Auto migrate
-	if err := config.DB.AutoMigrate(&models.User{}); err != nil {
+	if err := config.DB.AutoMigrate(
+		&models.User{},
+		&models.Class{}); err != nil {
 		log.Fatalf("Migration failed: %v", err)
 	}
 
@@ -43,14 +45,17 @@ func main() {
 
 	// Repositories
 	userRepo := repositories.NewUserRepo()
+	classRepo := repositories.NewClassRepo()
 
 	// Services
 	authService := services.NewAuthService(userRepo)
 	userService := services.NewUserService(userRepo)
+	classService := services.NewClassService(classRepo)
 
 	// Handlers
 	authH := handlers.NewAuthHandler(authService)
 	userH := handlers.NewUserHandler(userService)
+	classH := handlers.NewClassHandler(classService)
 
 	homeH := handlers.NewHomeHandler()
 	aboutH := handlers.NewAboutHandler()
@@ -65,6 +70,7 @@ func main() {
 		r.Get("/login", authH.LoginPage)
 		r.Post("/login", authH.LoginPost)
 		r.Get("/about", aboutH.About)
+
 	})
 
 	// Member tier (Any Logged-in User to start with)
@@ -79,6 +85,7 @@ func main() {
 		r.Get("/profile", userH.ProfilePage)
 		r.Post("/profile/update", userH.UpdateProfile)
 		r.Post("/profile/update-password", userH.UpdatePassword)
+		r.Get("/classes", classH.ClassesPage)
 	})
 
 	// Staff tier (Trainer or Admin)
