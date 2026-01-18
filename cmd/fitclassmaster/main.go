@@ -60,10 +60,10 @@ func main() {
 	userH := handlers.NewUserHandler(userService)
 	classH := handlers.NewClassHandler(classService)
 	enrollH := handlers.NewEnrollmentHandler(enrollService)
+	dashboardH := handlers.NewDashboardHandler(enrollService)
 
 	homeH := handlers.NewHomeHandler()
 	aboutH := handlers.NewAboutHandler()
-	dashboardH := handlers.NewDashboardHandler()
 
 	// Public routes
 	r.Group(func(r chi.Router) {
@@ -90,7 +90,11 @@ func main() {
 		r.Post("/profile/update", userH.UpdateProfile)
 		r.Post("/profile/update-password", userH.UpdatePassword)
 		r.Get("/classes", classH.ClassesPage)
-		r.Post("/api/enrollments", enrollH.Enroll)
+
+		r.Get("/dashboard", dashboardH.Dashboard)
+		r.Post("/enrollments", enrollH.Enroll)
+		r.Delete("/enrollments/{id}", enrollH.Cancel)
+
 	})
 
 	// Staff tier (Trainer or Admin)

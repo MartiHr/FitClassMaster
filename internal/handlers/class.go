@@ -33,8 +33,7 @@ func (h *ClassHandler) ClassesPage(w http.ResponseWriter, r *http.Request) {
 	// Fetch all available classes
 	classesWithStatus, err := h.ClassService.GetClassesForUser(userID)
 	if err != nil {
-		http.Error(w, "Failed to load classes", http.StatusInternalServerError)
-		return
+		// ?
 	}
 
 	data := map[string]any{

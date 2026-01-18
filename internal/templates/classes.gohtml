@@ -28,7 +28,7 @@
                             </button>
                         {{ else }}
                             <button class="btn-enroll"
-                                    hx-post="/api/enrollments"
+                                    hx-post="/enrollments"
                                     hx-vals='{"class_id": "{{ .Class.ID }}"}'
                                     hx-target="#enroll-section-{{ .Class.ID }}"
                                     hx-swap="outerHTML">

@@ -34,3 +34,21 @@ func (h *EnrollmentHandler) Enroll(w http.ResponseWriter, r *http.Request) {
         </button>
     `))
 }
+
+func (h *EnrollmentHandler) Cancel(w http.ResponseWriter, r *http.Request) {
+	userID, _ := auth.GetUserIDFromSession(r)
+
+	// Get classID from URL path
+	classIDStr := r.PathValue("id")
+	classID, _ := strconv.ParseUint(classIDStr, 10, 32)
+
+	// Call service to remove/cancel record
+	err := h.Service.CancelEnrollment(userID, uint(classID))
+	if err != nil {
+		http.Error(w, "Could not cancel", http.StatusBadRequest)
+		return
+	}
+
+	// HTMX: Return nothing (empty string) to remove the element from the DOM
+	w.WriteHeader(http.StatusOK)
+}

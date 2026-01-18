@@ -17,3 +17,9 @@ func (r *ClassRepo) GetAll() ([]models.Class, error) {
 	err := config.DB.Order("start_time asc").Find(&classes).Error
 	return classes, err
 }
+
+func (r *ClassRepo) GetByID(id uint) (*models.Class, error) {
+	var class models.Class
+	err := config.DB.First(&class, id).Error
+	return &class, err
+}
