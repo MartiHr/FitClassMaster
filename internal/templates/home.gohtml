@@ -1,9 +1,34 @@
 {{ define "content" }}
-    <h1>Welcome to FitClassMaster ✅</h1>
+    <div class="hero">
+        <div class="hero-overlay">
+            <h1>Master Your Fitness Schedule</h1>
+            <p>Your structured platform for fitness and progress monitoring.</p>
+            <div class="hero-btns">
+                {{ if .IsAuthenticated }}
+                    <a href="/dashboard" class="btn-primary">Go to Dashboard</a>
+                {{ else }}
+                    <a href="/register" class="btn-primary">Join Now</a>
+                    <a href="/login" class="btn-secondary">Member Login</a>
+                {{ end }}
+            </div>
+        </div>
+    </div>
 
-    <button hx-get="/htmx/hello" hx-target="#result">
-        Hello from HTMX
-    </button>
-
-    <div id="result"></div>
+    <section class="features">
+        <div class="feature-card">
+            <i class="fas fa-calendar-check"></i>
+            <h3>Smart Scheduling</h3>
+            <p>View real-time class schedules and book your spot instantly.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-chart-line"></i>
+            <h3>Progress Monitoring</h3>
+            <p>Keep track of your attended classes and monitor your fitness journey over time.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-user-shield"></i>
+            <h3>Secure Profiles</h3>
+            <p>Manage your personal data and security credentials through your private user dashboard.</p>
+        </div>
+    </section>
 {{ end }}

@@ -20,6 +20,6 @@ body {
 
 main {
     flex: 1; /* Makes the main content area expand to fill space */
-    margin-left: 20px;
-    margin-right: 20px;
+    /*margin-left: 20px;*/
+    /*margin-right: 20px;*/
 }

@@ -59,7 +59,7 @@ func main() {
 	// Public routes
 	r.Group(func(r chi.Router) {
 		r.Get("/", homeH.Home)
-		r.Get("/htmx/hello", homeH.HelloHtmx)
+		//r.Get("/htmx/hello", homeH.HelloHtmx)
 		r.Get("/register", authH.RegisterPage)
 		r.Post("/register", authH.RegisterPost)
 		r.Get("/login", authH.LoginPage)

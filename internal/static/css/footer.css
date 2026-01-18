@@ -2,7 +2,7 @@ footer {
     background-color: #1a1a1a;
     color: #ecf0f1;
     padding: 3rem 0 1rem 0;
-    margin-top: 4rem; /* Pushes footer away from page content */
+    /*margin-top: 4rem; !* Pushes footer away from page content *!*/
     border-top: 3px solid #ff4d4d; /* Matches the Gym Red theme */
 }
 

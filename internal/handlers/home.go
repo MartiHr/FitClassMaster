@@ -12,9 +12,9 @@ func NewHomeHandler() *HomeHandler {
 }
 
 func (h *HomeHandler) Home(w http.ResponseWriter, r *http.Request) {
-	templates.SmartRender(w, r, "home", "", map[string]any{"Title": "FitClassMaster — Home"})
-}
+	data := map[string]any{
+		"Title": "Home | FitClassMaster",
+	}
 
-func (h *HomeHandler) HelloHtmx(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello from HTMX! ✅"))
+	templates.SmartRender(w, r, "home", "", data)
 }
