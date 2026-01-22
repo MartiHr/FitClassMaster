@@ -28,7 +28,8 @@ func main() {
 	if err := config.DB.AutoMigrate(
 		&models.User{},
 		&models.Class{},
-		&models.Enrollment{}); err != nil {
+		&models.Enrollment{},
+		&models.Exercise{}); err != nil {
 		log.Fatalf("Migration failed: %v", err)
 	}
 
@@ -48,12 +49,14 @@ func main() {
 	userRepo := repositories.NewUserRepo()
 	classRepo := repositories.NewClassRepo()
 	enrollRepo := repositories.NewEnrollmentRepo()
+	exerciseRepo := repositories.NewExerciseRepo()
 
 	// Services
 	authService := services.NewAuthService(userRepo)
 	userService := services.NewUserService(userRepo)
 	classService := services.NewClassService(classRepo)
 	enrollService := services.NewEnrollmentService(enrollRepo, classRepo)
+	exerciseService := services.NewExerciseService(exerciseRepo)
 
 	// Handlers
 	authH := handlers.NewAuthHandler(authService)
@@ -61,6 +64,7 @@ func main() {
 	classH := handlers.NewClassHandler(classService, enrollService)
 	enrollH := handlers.NewEnrollmentHandler(enrollService)
 	dashboardH := handlers.NewDashboardHandler(enrollService)
+	exerciseH := handlers.NewExerciseHandler(exerciseService)
 
 	homeH := handlers.NewHomeHandler()
 	aboutH := handlers.NewAboutHandler()
@@ -96,14 +100,17 @@ func main() {
 		r.Delete("/enrollments/{id}", enrollH.Cancel)
 
 		r.Get("/classes/{id}", classH.ClassDetailsPage)
+
+		r.Get("/exercises", exerciseH.List)
 	})
 
 	// Staff tier (Trainer or Admin)
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.RequireAuth)
 		r.Use(middlewares.RequireRole(models.RoleTrainer, models.RoleAdmin))
-
-		// r.Get("/manage-programs", programH.List)
+		
+		r.Post("/exercises", exerciseH.Create)
+		r.Delete("/exercises/{id}", exerciseH.Delete)
 	})
 
 	// Admin tier (Admin Only)

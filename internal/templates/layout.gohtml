@@ -15,6 +15,7 @@
         <link rel="stylesheet" href="/static/css/classes.css">
         <link rel="stylesheet" href="/static/css/dashboard.css">
         <link rel="stylesheet" href="/static/css/class_details.css">
+        <link rel="stylesheet" href="/static/css/exercises.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
@@ -27,7 +28,8 @@
                 <a href="/">Home</a>
                 {{ if .IsAuthenticated }}
                     <a href="/classes">Classes</a>
-                    <a href="/dashboard">Dashboard</a>
+                    <a href="/dashboard">Dashboard
+                    <a href="/exercises">Exercises</a>
                     <a href="/profile">Profile</a>
                 {{ end }}
                 <a href="/about">About</a>

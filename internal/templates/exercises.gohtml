@@ -1,0 +1,71 @@
+{{ define "content" }}
+    <div class="exercises-container">
+        <div class="page-header">
+            <h1><i class="fas fa-dumbbell"></i> Exercise Library</h1>
+            <p>Browse our comprehensive database of exercises.</p>
+        </div>
+
+        {{ if .CanManage }}
+            <div class="admin-panel">
+                <h3><i class="fas fa-plus-circle"></i> Add New Exercise</h3>
+                <form action="/exercises" method="POST" class="create-form">
+                    <div class="form-row">
+                        <input type="text" name="name" placeholder="Exercise Name (e.g. Bench Press)" required>
+                        <select name="muscle_group" required>
+                            <option value="" disabled selected>Select Muscle Group</option>
+                            <option value="Chest">Chest</option>
+                            <option value="Back">Back</option>
+                            <option value="Legs">Legs</option>
+                            <option value="Shoulders">Shoulders</option>
+                            <option value="Arms">Arms</option>
+                            <option value="Core">Core</option>
+                            <option value="Cardio">Cardio</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <input type="text" name="equipment" placeholder="Equipment (e.g. Barbell, Machine)">
+                        <input type="url" name="video_url" placeholder="Video Demo URL (Optional)">
+                    </div>
+                    <textarea name="description" placeholder="Brief description of the movement..." rows="2"></textarea>
+                    <button type="submit" class="btn-primary">Add Exercise</button>
+                </form>
+            </div>
+        {{ end }}
+
+        <div class="exercise-grid">
+            {{ range .Exercises }}
+                <div class="exercise-card" id="exercise-{{ .ID }}">
+                    <div class="card-header">
+                        <h4>{{ .Name }}</h4>
+                        <span class="badge">{{ .MuscleGroup }}</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="description">{{ .Description }}</p>
+                        <div class="meta">
+                            <small><i class="fas fa-tools"></i> {{ .Equipment }}</small>
+                            {{ if .VideoURL }}
+                                <a href="{{ .VideoURL }}" target="_blank" class="video-link"><i class="fas fa-play-circle"></i> Watch Demo</a>
+                            {{ end }}
+                        </div>
+                    </div>
+
+                    {{ if $.CanManage }}
+                        <div class="card-footer">
+                            <button class="btn-delete"
+                                    hx-delete="/exercises/{{ .ID }}"
+                                    hx-confirm="Delete this exercise permanently?"
+                                    hx-target="#exercise-{{ .ID }}"
+                                    hx-swap="outerHTML">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    {{ end }}
+                </div>
+            {{ else }}
+                <div class="empty-state">
+                    <p>No exercises found in the library yet.</p>
+                </div>
+            {{ end }}
+        </div>
+    </div>
+{{ end }}
