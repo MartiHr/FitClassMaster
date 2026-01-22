@@ -15,26 +15,31 @@ func NewEnrollmentService(repo *repositories.EnrollmentRepo, classRepo *reposito
 	return &EnrollmentService{Repo: repo, ClassRepo: classRepo}
 }
 
+func (s *EnrollmentService) IsUserEnrolled(userID, classID uint) (bool, error) {
+	return s.Repo.Exists(userID, classID)
+}
+
 func (s *EnrollmentService) EnrollUser(userID, classID uint) error {
-	// 1. Get Class Details via ClassRepo to check MaxCapacity
+	// Get Class Details via ClassRepo to check MaxCapacity
 	class, err := s.ClassRepo.GetByID(classID)
 	if err != nil {
 		return errors.New("class not found")
 	}
 
-	// 2. Check current capacity via EnrollmentRepo
+	// Check current capacity via EnrollmentRepo
 	currentCount, _ := s.Repo.CountActive(classID)
 	if int(currentCount) >= class.MaxCapacity {
 		return errors.New("this class is full")
 	}
 
-	// 3. Check if already enrolled (using your existing Repo.Exists)
-	exists, _ := s.Repo.Exists(userID, classID)
+	// Check if already enrolled
+	exists, _ := s.IsUserEnrolled(userID, classID)
+
 	if exists {
 		return errors.New("you are already enrolled in this class")
 	}
 
-	// 4. Create enrollment
+	// Create enrollment
 	enrollment := &models.Enrollment{
 		UserID:  userID,
 		ClassID: classID,

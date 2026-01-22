@@ -58,7 +58,7 @@ func main() {
 	// Handlers
 	authH := handlers.NewAuthHandler(authService)
 	userH := handlers.NewUserHandler(userService)
-	classH := handlers.NewClassHandler(classService)
+	classH := handlers.NewClassHandler(classService, enrollService)
 	enrollH := handlers.NewEnrollmentHandler(enrollService)
 	dashboardH := handlers.NewDashboardHandler(enrollService)
 
@@ -95,6 +95,7 @@ func main() {
 		r.Post("/enrollments", enrollH.Enroll)
 		r.Delete("/enrollments/{id}", enrollH.Cancel)
 
+		r.Get("/classes/{id}", classH.ClassDetailsPage)
 	})
 
 	// Staff tier (Trainer or Admin)

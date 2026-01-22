@@ -23,3 +23,13 @@ func (r *ClassRepo) GetByID(id uint) (*models.Class, error) {
 	err := config.DB.First(&class, id).Error
 	return &class, err
 }
+
+func (r *ClassRepo) GetWithDetails(id uint) (*models.Class, error) {
+	var class models.Class
+	// We use Preload to fetch related data in one go
+	err := config.DB.Preload("Trainer").
+		Preload("Enrollments.User").
+		First(&class, id).Error
+
+	return &class, err
+}

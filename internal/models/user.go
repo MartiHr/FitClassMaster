@@ -21,6 +21,10 @@ type User struct {
 	UpdatedAt time.Time
 }
 
+func (u *User) FullName() string {
+	return u.FirstName + " " + u.LastName
+}
+
 // Helpers for role checking
 func (u *User) IsMember() bool  { return u.Role == RoleMember }
 func (u *User) IsAdmin() bool   { return u.Role == RoleAdmin }

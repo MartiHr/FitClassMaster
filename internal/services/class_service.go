@@ -41,5 +41,10 @@ func (s *ClassService) GetClassesForUser(userID uint) ([]map[string]interface{},
 			"IsEnrolled": isEnrolled,
 		})
 	}
+
 	return results, nil
+}
+
+func (s *ClassService) GetFullDetails(classID uint) (*models.Class, error) {
+	return s.Repo.GetWithDetails(classID)
 }

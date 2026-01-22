@@ -1,0 +1,205 @@
+/* class_details.css */
+
+.details-container {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+/* Header */
+.details-header {
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #f1f2f6;
+    padding-bottom: 1rem;
+    position: relative;
+}
+
+.back-link {
+    color: #636e72;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 0.5rem;
+}
+
+.back-link:hover {
+    color: #2d3436;
+}
+
+.details-header h1 {
+    font-size: 2.5rem;
+    color: #2d3436;
+    margin: 0.5rem 0;
+}
+
+.badge-primary {
+    background-color: #0984e3;
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    vertical-align: middle;
+}
+
+/* Grid Layout */
+.details-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* Info takes 2/3, Roster takes 1/3 */
+    gap: 2rem;
+}
+
+/* Info Card (Left) */
+.info-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #dfe6e9;
+}
+
+.info-card h3 {
+    margin-top: 0;
+    color: #2d3436;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 1.5rem;
+}
+
+.info-card p {
+    line-height: 1.6;
+    color: #636e72;
+    margin-bottom: 1.5rem;
+}
+
+.meta-info p {
+    margin-bottom: 0.8rem;
+    font-size: 1.05rem;
+    color: #2d3436;
+}
+
+.meta-info i {
+    width: 25px;
+    color: #0984e3;
+    text-align: center;
+}
+
+/* Action Buttons */
+.action-area {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed #b2bec3;
+}
+
+.btn-enroll {
+    background-color: #00b894;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s;
+}
+
+.btn-enroll:hover {
+    background-color: #00a884;
+}
+
+.btn-disabled {
+    background-color: #b2bec3;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    width: 100%;
+    cursor: not-allowed;
+}
+
+/* Roster Card (Right) */
+.roster-card {
+    background: #f9f9f9; /* Slightly darker to differentiate */
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #dfe6e9;
+    height: fit-content;
+}
+
+.roster-card h3 {
+    font-size: 1.2rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #2d3436;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.member-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.member-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.member-item:last-child {
+    border-bottom: none;
+}
+
+.member-avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #dfe6e9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #636e72;
+}
+
+.member-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.member-name {
+    font-weight: 600;
+    color: #2d3436;
+    font-size: 0.95rem;
+}
+
+.member-status {
+    font-size: 0.75rem;
+    color: #00b894; /* Green text for "Active" */
+}
+
+.empty-list {
+    text-align: center;
+    color: #b2bec3;
+    padding: 1rem 0;
+    font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+}

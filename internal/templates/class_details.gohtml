@@ -1,0 +1,65 @@
+{{ define "content" }}
+    <div class="details-container">
+        <div class="details-header">
+            <a href="/dashboard" class="back-link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+            <h1>{{ .Class.Name }}</h1>
+            <span class="badge badge-primary">{{ .Class.DifficultyLevel }}</span>
+        </div>
+
+        <div class="details-grid">
+            <div class="info-card">
+                <h3><i class="fas fa-info-circle"></i> About this Class</h3>
+                <p>{{ .Class.Description }}</p>
+
+                <div class="meta-info">
+                    <p><strong><i class="fas fa-user-tie"></i> Trainer:</strong> {{ .Class.Trainer.FullName }}</p>
+                    <p><strong><i class="far fa-clock"></i> Time:</strong> {{ .Class.StartTime.Format "Mon, Jan 02 at 15:04" }}</p>
+                    <p><strong><i class="fas fa-users"></i> Capacity:</strong> {{ len .Class.Enrollments }} / {{ .Class.MaxCapacity }}</p>
+                </div>
+
+                <div class="action-area">
+                    {{ if .IsEnrolled }}
+                        <button class="btn-cancel"
+                                hx-delete="/enrollments/{{ .Class.ID }}"
+                                hx-confirm="Leave this class?"
+                                hx-target="body"
+                                hx-push-url="true">
+                            Leave Class
+                        </button>
+                    {{ else }}
+                        {{ if ge (len .Class.Enrollments) .Class.MaxCapacity }}
+                            <button class="btn-disabled" disabled>Class Full</button>
+                        {{ else }}
+                            <button class="btn-enroll"
+                                    hx-post="/enrollments"
+                                    hx-vals='{"class_id": {{ .Class.ID }}}'>
+                                Enroll Now
+                            </button>
+                        {{ end }}
+                    {{ end }}
+                </div>
+            </div>
+
+            <div class="roster-card">
+                <h3><i class="fas fa-list-alt"></i> Assigned Members</h3>
+                <ul class="member-list">
+                    {{ range .Roster }}
+                        {{ if eq .Status "active" }}
+                            <li class="member-item">
+                                <div class="member-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="member-info">
+                                    <span class="member-name">{{ .User.FullName }}</span>
+                                    <span class="member-status">Active</span>
+                                </div>
+                            </li>
+                        {{ end }}
+                    {{ else }}
+                        <li class="empty-list">No members enrolled yet.</li>
+                    {{ end }}
+                </ul>
+            </div>
+        </div>
+    </div>
+{{ end }}
