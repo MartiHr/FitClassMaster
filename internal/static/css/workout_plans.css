@@ -1,0 +1,117 @@
+.plans-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    border-bottom: 2px solid #f1f2f6;
+    padding-bottom: 1.5rem;
+}
+
+.btn-create {
+    background-color: #0984e3;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-create:hover {
+    background-color: #00cec9;
+}
+
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+}
+
+.plan-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border: 1px solid #dfe6e9;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.plan-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+.plan-header {
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    border-radius: 12px 12px 0 0;
+}
+
+.plan-header h3 {
+    margin: 0 0 0.5rem 0;
+    color: #2d3436;
+    font-size: 1.25rem;
+}
+
+.trainer-badge {
+    font-size: 0.85rem;
+    color: #636e72;
+    background: #dfe6e9;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.plan-body {
+    padding: 1.5rem;
+    flex-grow: 1;
+}
+
+.plan-body p {
+    color: #636e72;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.plan-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #b2bec3;
+    font-weight: 500;
+}
+
+.plan-footer {
+    padding: 1.5rem;
+    border-top: 1px solid #eee;
+}
+
+.btn-view {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: white;
+    border: 2px solid #0984e3;
+    color: #0984e3;
+    padding: 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.btn-view:hover {
+    background: #0984e3;
+    color: white;
+}

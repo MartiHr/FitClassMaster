@@ -25,7 +25,7 @@ func (r *WorkoutRepo) GetByID(id uint) (*models.WorkoutPlan, error) {
 		Preload("Trainer").
 		// Preload the link table (WorkoutExercises)
 		Preload("WorkoutExercises", func(db *gorm.DB) *gorm.DB {
-			return db.Order("workout_exercises.order asc") // Ensure correct order
+			return db.Order("workout_exercises.[order] asc") // Ensure correct order
 		}).
 		// Preload the actual Exercise details inside the link table
 		Preload("WorkoutExercises.Exercise").
@@ -41,8 +41,14 @@ func (r *WorkoutRepo) GetAllForTrainer(trainerID uint) ([]models.WorkoutPlan, er
 }
 
 // GetAll fetches all plans (for Members to browse if allowed, or Admins)
+// internal/repositories/workout_repo.go
 func (r *WorkoutRepo) GetAll() ([]models.WorkoutPlan, error) {
 	var plans []models.WorkoutPlan
-	err := config.DB.Preload("Trainer").Find(&plans).Error
+
+	err := config.DB.
+		Preload("Trainer").
+		Preload("WorkoutExercises").
+		Find(&plans).Error
+
 	return plans, err
 }

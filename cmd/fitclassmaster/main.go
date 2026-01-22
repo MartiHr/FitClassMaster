@@ -31,7 +31,9 @@ func main() {
 		&models.Enrollment{},
 		&models.Exercise{},
 		&models.WorkoutPlan{},
-		&models.WorkoutExercise{}); err != nil {
+		&models.WorkoutExercise{},
+		&models.WorkoutSession{},
+		&models.SessionLog{}); err != nil {
 		log.Fatalf("Migration failed: %v", err)
 	}
 
@@ -107,6 +109,9 @@ func main() {
 		r.Get("/classes/{id}", classH.ClassDetailsPage)
 
 		r.Get("/exercises", exerciseH.List)
+
+		r.Get("/workout-plans", workoutH.List)
+		r.Get("/workout-plans/{id}", workoutH.DetailsPage)
 	})
 
 	// Staff tier (Trainer or Admin)

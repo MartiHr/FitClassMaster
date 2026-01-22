@@ -106,3 +106,32 @@ func (h *WorkoutHandler) List(w http.ResponseWriter, r *http.Request) {
 
 	templates.SmartRender(w, r, "workout_plans", "", data)
 }
+
+// DetailsPage handles GET /workout-plans/{id}
+func (h *WorkoutHandler) DetailsPage(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	// Fetch Deep Details (Plan + Exercises + Specifics)
+	plan, err := h.Service.GetFullDetails(uint(id))
+	if err != nil {
+		http.Error(w, "Plan not found", http.StatusNotFound)
+		return
+	}
+
+	// Determine Permissions (For "Edit/Delete" buttons)
+	role, _ := auth.GetUserRoleFromSession(r)
+	canManage := (role == "trainer" || role == "admin")
+
+	data := map[string]any{
+		"Title":     plan.Name,
+		"Plan":      plan,
+		"CanManage": canManage,
+	}
+
+	templates.SmartRender(w, r, "workout_plan_details", "", data)
+}

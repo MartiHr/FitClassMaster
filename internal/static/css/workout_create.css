@@ -58,6 +58,10 @@
     font-size: 1.1rem;
 }
 
+.workout-container .btn-cancel {
+    margin-bottom: 1rem;
+}
+
 .btn-remove:hover {
     color: #d63031;
 }

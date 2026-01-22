@@ -1,0 +1,50 @@
+{{ define "content" }}
+    <div class="plans-container">
+        <div class="header-section">
+            <div class="text-content">
+                <h1><i class="fas fa-clipboard-check"></i> Workout Plans</h1>
+                <p>Browse structured training routines created by our professional trainers.</p>
+            </div>
+
+            {{ if .CanManage }}
+                <div class="action-content">
+                    <a href="/workout-plans/create" class="btn-create">
+                        <i class="fas fa-plus"></i> Create New Plan
+                    </a>
+                </div>
+            {{ end }}
+        </div>
+
+        <div class="plans-grid">
+            {{ range .Plans }}
+                <div class="plan-card">
+                    <div class="plan-header">
+                        <h3>{{ .Name }}</h3>
+                        <span class="trainer-badge">
+                    <i class="fas fa-user-tie"></i> {{ .Trainer.FullName }}
+                </span>
+                    </div>
+
+                    <div class="plan-body">
+                        <p>{{ .Description }}</p>
+                        <div class="plan-stats">
+                            <span><i class="fas fa-dumbbell"></i> {{ len .WorkoutExercises }} Exercises</span>
+                            <span><i class="fas fa-calendar-alt"></i> {{ .CreatedAt.Format "Jan 02, 2006" }}</span>
+                        </div>
+                    </div>
+
+                    <div class="plan-footer">
+                        <a href="/workout-plans/{{ .ID }}" class="btn-view">
+                            View Routine <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            {{ else }}
+                <div class="empty-state">
+                    <i class="fas fa-clipboard fa-3x"></i>
+                    <p>No workout plans available yet.</p>
+                </div>
+            {{ end }}
+        </div>
+    </div>
+{{ end }}

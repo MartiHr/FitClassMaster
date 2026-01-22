@@ -1,0 +1,143 @@
+.details-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+.details-header {
+    margin-bottom: 2.5rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 2rem;
+}
+
+.back-link {
+    color: #636e72;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 1rem;
+}
+
+.title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.meta-row {
+    display: flex;
+    gap: 1.5rem;
+    color: #606264;
+    margin: 0.5rem 0 1.5rem 0;
+    font-size: 0.95rem;
+}
+
+.description {
+    font-size: 1.1rem;
+    color: #2d3436;
+    line-height: 1.6;
+}
+
+/* Routine Card */
+.routine-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border: 1px solid #dfe6e9;
+    padding: 2rem;
+}
+
+.exercise-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.exercise-item {
+    display: flex;
+    gap: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f1f2f6;
+}
+
+.exercise-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.ex-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #dfe6e9;
+    min-width: 30px;
+    text-align: center;
+}
+
+.ex-content {
+    flex-grow: 1;
+}
+
+.ex-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.ex-header h4 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #2d3436;
+}
+
+.muscle-tag {
+    background: #e1f5fe;
+    color: #0288d1;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+/* Stat Pills */
+.ex-stats {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.stat-pill {
+    background: #f8f9fa;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 5px 12px;
+    text-align: center;
+    min-width: 60px;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.7rem;
+    color: #b2bec3;
+    font-weight: bold;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #2d3436;
+}
+
+.ex-notes {
+    background: #fff8e1; /* Light yellow note */
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #d35400;
+    display: inline-block;
+}
