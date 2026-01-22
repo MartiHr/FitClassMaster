@@ -141,3 +141,21 @@
     color: #d35400;
     display: inline-block;
 }
+
+.btn-start-workout {
+    background-color: #00b894;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s, background 0.2s;
+}
+
+.btn-start-workout:hover {
+    background-color: #00a884;
+    transform: translateY(-2px);
+}

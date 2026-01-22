@@ -8,6 +8,7 @@ import (
 	"FitClassMaster/internal/repositories"
 	"FitClassMaster/internal/services"
 	"FitClassMaster/internal/templates"
+	"FitClassMaster/internal/websockets"
 
 	"log"
 	"net/http"
@@ -55,6 +56,7 @@ func main() {
 	enrollRepo := repositories.NewEnrollmentRepo()
 	exerciseRepo := repositories.NewExerciseRepo()
 	workoutRepo := repositories.NewWorkoutRepo()
+	sessionRepo := repositories.NewSessionRepo()
 
 	// Services
 	authService := services.NewAuthService(userRepo)
@@ -63,6 +65,11 @@ func main() {
 	enrollService := services.NewEnrollmentService(enrollRepo, classRepo)
 	exerciseService := services.NewExerciseService(exerciseRepo)
 	workoutService := services.NewWorkoutService(workoutRepo)
+	sessionService := services.NewSessionService(sessionRepo)
+
+	// Initialize and Run the Hub
+	hub := websockets.NewHub(sessionService)
+	go hub.Run() // <-- Crucial: Run the hub in a separate goroutine
 
 	// Handlers
 	authH := handlers.NewAuthHandler(authService)
@@ -72,9 +79,11 @@ func main() {
 	dashboardH := handlers.NewDashboardHandler(enrollService)
 	exerciseH := handlers.NewExerciseHandler(exerciseService)
 	workoutH := handlers.NewWorkoutHandler(workoutService, exerciseService)
+	sessionH := handlers.NewSessionHandler(sessionService)
 
 	homeH := handlers.NewHomeHandler()
 	aboutH := handlers.NewAboutHandler()
+	wsHandler := handlers.NewWSHandler(hub) // Pass the hub, not the service
 
 	// Public routes
 	r.Group(func(r chi.Router) {
@@ -112,6 +121,11 @@ func main() {
 
 		r.Get("/workout-plans", workoutH.List)
 		r.Get("/workout-plans/{id}", workoutH.DetailsPage)
+
+		r.Post("/sessions/start", sessionH.Start)
+		r.Get("/sessions/{id}/perform", sessionH.PerformPage)
+
+		r.Get("/ws/session/{id}", wsHandler.HandleSessionConnection)
 	})
 
 	// Staff tier (Trainer or Admin)

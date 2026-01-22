@@ -1,0 +1,142 @@
+{{ define "content" }}
+    <div class="perform-container">
+        <div class="perform-header">
+            <div class="session-info">
+                <h2>{{ .Session.WorkoutPlan.Name }}</h2>
+                <span class="status-badge">Connecting...</span> </div>
+            <div class="timer-box">
+                <i class="fas fa-stopwatch"></i>
+                <span id="session-timer">00:00</span>
+            </div>
+        </div>
+
+        <div class="workout-flow">
+            {{ range .Session.WorkoutPlan.WorkoutExercises }}
+                <div class="exercise-card" id="exercise-{{ .ID }}">
+                    <div class="ex-header">
+                        <h3>{{ .Exercise.Name }}</h3>
+                        <span class="order-badge">#{{ .Order }}</span>
+                    </div>
+
+                    <div class="ex-target">
+                        Target: <strong>{{ .Sets }} Sets</strong> × <strong>{{ .Reps }} Reps</strong>
+                        {{ if .Notes }}
+                            <div class="note-tooltip"><i class="fas fa-info-circle"></i> {{ .Notes }}</div>
+                        {{ end }}
+                    </div>
+
+                    <div class="log-grid">
+                        <div class="log-header">
+                            <span>Set</span>
+                            <span>Reps</span>
+                            <span>Weight (kg)</span>
+                            <span>Action</span>
+                        </div>
+
+                        <form class="log-row-form"
+                              onsubmit="logSet(this);">
+
+                            <span class="set-num">1</span>
+                            <input type="number" name="reps" value="{{ .Reps }}" class="input-tiny">
+                            <input type="number" name="weight" placeholder="0" class="input-tiny">
+                            <input type="hidden" name="exercise_id" value="{{ .Exercise.ID }}">
+
+                            <button type="submit" class="btn-check">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </form>
+
+                        {{ if gt .Sets 1 }}
+                            <div class="log-row-placeholder">
+                                <span>+ Remaining sets...</span>
+                            </div>
+                        {{ end }}
+                    </div>
+                </div>
+            {{ end }}
+        </div>
+
+        <div class="perform-footer">
+            <button class="btn-finish" onclick="window.location.href='/dashboard'">
+                <i class="fas fa-flag-checkered"></i> Finish Workout
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 1. Setup Connection
+        const sessionID = "{{ .Session.ID }}";
+        const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+        const host = window.location.host;
+        const socketUrl = `${protocol}${host}/ws/session/${sessionID}`;
+
+        console.log("Connecting to:", socketUrl);
+        let socket = new WebSocket(socketUrl);
+
+        // 2. Handle Connection States
+        socket.onopen = () => {
+            console.log("✅ WebSocket Connected");
+            const badge = document.querySelector('.status-badge');
+            if(badge) {
+                badge.innerText = "Live Connection";
+                badge.style.background = "#00b894";
+            }
+        };
+
+        socket.onclose = () => {
+            console.log("❌ WebSocket Disconnected");
+            const badge = document.querySelector('.status-badge');
+            if(badge) {
+                badge.innerText = "Offline";
+                badge.style.background = "#d63031";
+            }
+        };
+
+        socket.onerror = (err) => {
+            console.error("WS Error:", err);
+        };
+
+        // 3. Send Data (Log Set)
+        function logSet(form) {
+            event.preventDefault(); // Stop page reload
+
+            // Gather inputs
+            const exerciseID = parseInt(form.querySelector('input[name="exercise_id"]').value);
+            const reps = parseInt(form.querySelector('input[name="reps"]').value);
+            const weight = parseFloat(form.querySelector('input[name="weight"]').value) || 0;
+            const setNum = parseInt(form.querySelector('.set-num').innerText);
+
+            const msg = {
+                type: "log_set",
+                exercise_id: exerciseID,
+                set_number: setNum,
+                reps: reps,
+                weight: weight
+            };
+
+            // Send
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify(msg));
+
+                // UI Feedback
+                const btn = form.querySelector('.btn-check');
+                btn.classList.add('completed');
+                btn.innerHTML = '<i class="fas fa-check-double"></i>';
+                btn.disabled = true;
+            } else {
+                alert("Connection lost. Please refresh.");
+            }
+        }
+
+        // 4. Timer
+        let seconds = 0;
+        setInterval(() => {
+            seconds++;
+            const date = new Date(0);
+            date.setSeconds(seconds);
+            const timeString = date.toISOString().substr(14, 5);
+            const timerEl = document.getElementById('session-timer');
+            if(timerEl) timerEl.innerText = timeString;
+        }, 1000);
+    </script>
+{{ end }}

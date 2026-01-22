@@ -1,0 +1,158 @@
+.perform-container {
+    max-width: 600px; /* Narrower view for "App" feel */
+    margin: 1rem auto;
+    padding-bottom: 80px; /* Space for fixed footer */
+}
+
+.perform-header {
+    background: #2d3436;
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.perform-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.status-badge {
+    background: #00b894;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.timer-box {
+    font-family: monospace;
+    font-size: 1.5rem;
+    background: rgba(255,255,255,0.1);
+    padding: 5px 10px;
+    border-radius: 6px;
+}
+
+/* Exercise Card */
+.exercise-card {
+    background: white;
+    border: 1px solid #dfe6e9;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.ex-header {
+    background: #f1f2f6;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #dfe6e9;
+}
+
+.ex-header h3 {
+    margin: 0;
+    color: #2d3436;
+}
+
+.ex-target {
+    padding: 1rem;
+    color: #636e72;
+    border-bottom: 1px dashed #dfe6e9;
+}
+
+/* Logging Grid */
+.log-grid {
+    padding: 1rem;
+}
+
+.log-header {
+    display: grid;
+    grid-template-columns: 0.5fr 1fr 1fr 0.8fr;
+    font-size: 0.8rem;
+    color: #b2bec3;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.log-row-form {
+    display: grid;
+    grid-template-columns: 0.5fr 1fr 1fr 0.8fr;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.set-num {
+    text-align: center;
+    font-weight: bold;
+    color: #dfe6e9;
+    font-size: 1.2rem;
+}
+
+.input-tiny {
+    width: 100%;
+    padding: 8px;
+    text-align: center;
+    border: 1px solid #dfe6e9;
+    border-radius: 6px;
+    font-size: 1.1rem;
+}
+
+.btn-check {
+    background: #e1f5fe;
+    color: #0984e3;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+}
+
+.btn-check:hover {
+    background: #b3e5fc;
+}
+
+.btn-check.completed {
+    background: #00b894;
+    color: white;
+}
+
+.log-row-placeholder {
+    text-align: center;
+    color: #b2bec3;
+    font-style: italic;
+    padding: 0.5rem;
+}
+
+/* Footer Action */
+.perform-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 1rem;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.btn-finish {
+    background: #d63031;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(214, 48, 49, 0.3);
+}
