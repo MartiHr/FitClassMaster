@@ -1,0 +1,74 @@
+{{ define "content" }}
+    <div class="workout-container">
+        <h1><i class="fas fa-clipboard-list"></i> Create Workout Plan</h1>
+
+        <form action="/workout-plans/create" method="POST">
+            <div class="plan-meta">
+                <div class="form-group">
+                    <label>Plan Name</label>
+                    <input type="text" name="name" placeholder="e.g. High Intensity Leg Day" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" placeholder="Goal of this workout..." rows="2"></textarea>
+                </div>
+            </div>
+
+            <hr>
+
+            <h3>Exercises</h3>
+            <div id="exercise-rows-container">
+                {{ template "exercise-row" . }}
+            </div>
+
+            <button type="button"
+                    class="btn-add-row"
+                    hx-get="/workout-plans/add-row"
+                    hx-target="#exercise-rows-container"
+                    hx-swap="beforeend">
+                <i class="fas fa-plus"></i> Add Another Exercise
+            </button>
+
+            <hr>
+
+            <div class="form-actions">
+                <a href="/workout-plans" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-save">Save Workout Plan</button>
+            </div>
+        </form>
+    </div>
+{{ end }}
+
+{{ define "exercise-row" }}
+    <div class="exercise-row">
+        <div class="row-grid">
+            <div class="col-exercise">
+                <label>Exercise</label>
+                <select name="exercise_id[]" required>
+                    <option value="" disabled selected>Select...</option>
+                    {{ range .Exercises }}
+                        <option value="{{ .ID }}">{{ .Name }} ({{ .MuscleGroup }})</option>
+                    {{ end }}
+                </select>
+            </div>
+            <div class="col-small">
+                <label>Sets</label>
+                <input type="number" name="sets[]" value="3" required min="1">
+            </div>
+            <div class="col-small">
+                <label>Reps</label>
+                <input type="number" name="reps[]" value="10" required min="1">
+            </div>
+            <div class="col-notes">
+                <label>Notes</label>
+                <input type="text" name="notes[]" placeholder="e.g. Rest 60s">
+            </div>
+            <div class="col-action">
+                <label>&nbsp;</label>
+                <button type="button" class="btn-remove" onclick="this.closest('.exercise-row').remove()">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+{{ end }}

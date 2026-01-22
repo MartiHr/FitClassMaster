@@ -29,7 +29,9 @@ func main() {
 		&models.User{},
 		&models.Class{},
 		&models.Enrollment{},
-		&models.Exercise{}); err != nil {
+		&models.Exercise{},
+		&models.WorkoutPlan{},
+		&models.WorkoutExercise{}); err != nil {
 		log.Fatalf("Migration failed: %v", err)
 	}
 
@@ -50,6 +52,7 @@ func main() {
 	classRepo := repositories.NewClassRepo()
 	enrollRepo := repositories.NewEnrollmentRepo()
 	exerciseRepo := repositories.NewExerciseRepo()
+	workoutRepo := repositories.NewWorkoutRepo()
 
 	// Services
 	authService := services.NewAuthService(userRepo)
@@ -57,6 +60,7 @@ func main() {
 	classService := services.NewClassService(classRepo)
 	enrollService := services.NewEnrollmentService(enrollRepo, classRepo)
 	exerciseService := services.NewExerciseService(exerciseRepo)
+	workoutService := services.NewWorkoutService(workoutRepo)
 
 	// Handlers
 	authH := handlers.NewAuthHandler(authService)
@@ -65,6 +69,7 @@ func main() {
 	enrollH := handlers.NewEnrollmentHandler(enrollService)
 	dashboardH := handlers.NewDashboardHandler(enrollService)
 	exerciseH := handlers.NewExerciseHandler(exerciseService)
+	workoutH := handlers.NewWorkoutHandler(workoutService, exerciseService)
 
 	homeH := handlers.NewHomeHandler()
 	aboutH := handlers.NewAboutHandler()
@@ -108,9 +113,16 @@ func main() {
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.RequireAuth)
 		r.Use(middlewares.RequireRole(models.RoleTrainer, models.RoleAdmin))
-		
+
 		r.Post("/exercises", exerciseH.Create)
 		r.Delete("/exercises/{id}", exerciseH.Delete)
+
+		// Page to Create Plan
+		r.Get("/workout-plans/create", workoutH.CreatePage)
+		// HTMX Endpoint to get a new row
+		r.Get("/workout-plans/add-row", workoutH.AddExerciseRow)
+		// Form Submission
+		r.Post("/workout-plans/create", workoutH.CreatePost)
 	})
 
 	// Admin tier (Admin Only)
