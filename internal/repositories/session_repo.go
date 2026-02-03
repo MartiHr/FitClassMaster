@@ -41,3 +41,55 @@ func (r *SessionRepo) Update(session *models.WorkoutSession) error {
 func (r *SessionRepo) SaveLog(log *models.SessionLog) error {
 	return config.DB.Create(log).Error
 }
+
+// GetActiveSessionsForTrainer returns in_progress sessions using plans created by this trainer
+func (r *SessionRepo) GetActiveSessionsForTrainer(trainerID uint) ([]models.WorkoutSession, error) {
+	var sessions []models.WorkoutSession
+	err := config.DB.
+		Preload("User").
+		Preload("WorkoutPlan").
+		Joins("JOIN workout_plans ON workout_plans.id = workout_sessions.workout_plan_id").
+		Where("workout_sessions.status = ? AND workout_plans.trainer_id = ?", "in_progress", trainerID).
+		Order("workout_sessions.start_time desc").
+		Find(&sessions).Error
+	return sessions, err
+}
+
+// GetActiveSessions fetches all sessions with status 'in_progress'
+// Preloads User info so we know who is working out
+// Used for admin
+func (r *SessionRepo) GetActiveSessions() ([]models.WorkoutSession, error) {
+	var sessions []models.WorkoutSession
+	err := config.DB.
+		Preload("User"). // To show "John Doe is working out"
+		Preload("WorkoutPlan"). // To show "Leg Day"
+		Where("status = ?", "in_progress").
+		Order("start_time desc").
+		Find(&sessions).Error
+	return sessions, err
+}
+
+// GetCompletedByUserID fetches finished sessions for a specific member history
+func (r *SessionRepo) GetCompletedByUserID(userID uint) ([]models.WorkoutSession, error) {
+	var sessions []models.WorkoutSession
+	err := config.DB.
+		Preload("WorkoutPlan").
+		Where("user_id = ? AND status = ?", userID, "completed").
+		Order("start_time desc").
+		Find(&sessions).Error
+	return sessions, err
+}
+
+// GetRecentCompletedForTrainer fetches the last 5 completed sessions for a trainer's clients
+func (r *SessionRepo) GetRecentCompletedForTrainer(trainerID uint) ([]models.WorkoutSession, error) {
+	var sessions []models.WorkoutSession
+	err := config.DB.
+		Preload("User").
+		Preload("WorkoutPlan").
+		Joins("JOIN workout_plans ON workout_plans.id = workout_sessions.workout_plan_id").
+		Where("workout_sessions.status = ? AND workout_plans.trainer_id = ?", "completed", trainerID).
+		Order("workout_sessions.end_time desc").
+		Limit(5).
+		Find(&sessions).Error
+	return sessions, err
+}

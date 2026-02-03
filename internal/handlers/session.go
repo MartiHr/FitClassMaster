@@ -48,6 +48,7 @@ func (h *SessionHandler) Start(w http.ResponseWriter, r *http.Request) {
 func (h *SessionHandler) PerformPage(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, _ := strconv.ParseUint(idStr, 10, 32)
+	currentUserID, _ := auth.GetUserIDFromSession(r)
 
 	session, err := h.Service.GetDetails(uint(id))
 	if err != nil {
@@ -55,10 +56,30 @@ func (h *SessionHandler) PerformPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// It is a "Watcher" (Read-Only) view if:
+	// 1. The user is NOT the owner (Trainer viewing Member)
+	// 2. OR the session is already finished (Member viewing History)
+	isWatcher := (session.UserID != currentUserID) || (session.Status == "completed")
+
 	data := map[string]any{
-		"Title":   "Perform Workout",
-		"Session": session,
+		"Title":     "Workout Session",
+		"Session":   session,
+		"IsWatcher": isWatcher,
 	}
 
 	templates.SmartRender(w, r, "session_perform", "", data)
+}
+
+// Finish handles POST /sessions/{id}/finish
+func (h *SessionHandler) Finish(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, _ := strconv.ParseUint(idStr, 10, 32)
+
+	err := h.Service.FinishSession(uint(id))
+	if err != nil {
+		http.Error(w, "Failed to finish session", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK) // Respond with 200 OK so JS can redirect
 }

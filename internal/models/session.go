@@ -34,3 +34,13 @@ type SessionLog struct {
 	Weight    float64 `json:"weight"` // Users log the actual weight used
 	Notes     string  `json:"notes"`
 }
+
+// GetLog finds a specific log for an exercise and set number
+func (s *WorkoutSession) GetLog(exerciseID uint, setNum int) *SessionLog {
+	for _, log := range s.Logs {
+		if log.ExerciseID == exerciseID && log.SetNumber == setNum {
+			return &log
+		}
+	}
+	return nil
+}

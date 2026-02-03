@@ -69,21 +69,22 @@ func main() {
 
 	// Initialize and Run the Hub
 	hub := websockets.NewHub(sessionService)
-	go hub.Run() // <-- Crucial: Run the hub in a separate goroutine
+	go hub.Run() // Run the hub in a separate goroutine
 
 	// Handlers
 	authH := handlers.NewAuthHandler(authService)
 	userH := handlers.NewUserHandler(userService)
 	classH := handlers.NewClassHandler(classService, enrollService)
 	enrollH := handlers.NewEnrollmentHandler(enrollService)
-	dashboardH := handlers.NewDashboardHandler(enrollService)
+	dashboardH := handlers.NewDashboardHandler(enrollService, sessionService)
 	exerciseH := handlers.NewExerciseHandler(exerciseService)
 	workoutH := handlers.NewWorkoutHandler(workoutService, exerciseService)
 	sessionH := handlers.NewSessionHandler(sessionService)
 
 	homeH := handlers.NewHomeHandler()
 	aboutH := handlers.NewAboutHandler()
-	wsHandler := handlers.NewWSHandler(hub) // Pass the hub, not the service
+
+	wsHandler := handlers.NewWSHandler(hub)
 
 	// Public routes
 	r.Group(func(r chi.Router) {
@@ -126,6 +127,7 @@ func main() {
 		r.Get("/sessions/{id}/perform", sessionH.PerformPage)
 
 		r.Get("/ws/session/{id}", wsHandler.HandleSessionConnection)
+		r.Post("/sessions/{id}/finish", sessionH.Finish)
 	})
 
 	// Staff tier (Trainer or Admin)

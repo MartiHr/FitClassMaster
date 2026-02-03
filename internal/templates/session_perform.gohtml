@@ -3,7 +3,12 @@
         <div class="perform-header">
             <div class="session-info">
                 <h2>{{ .Session.WorkoutPlan.Name }}</h2>
-                <span class="status-badge">Connecting...</span> </div>
+                {{ if .IsWatcher }}
+                    <span class="status-badge" style="background: #e67e22;">Spectator Mode</span>
+                {{ else }}
+                    <span class="status-badge">Connecting...</span>
+                {{ end }}
+            </div>
             <div class="timer-box">
                 <i class="fas fa-stopwatch"></i>
                 <span id="session-timer">00:00</span>
@@ -12,7 +17,7 @@
 
         <div class="workout-flow">
             {{ range .Session.WorkoutPlan.WorkoutExercises }}
-                <div class="exercise-card" id="exercise-{{ .ID }}">
+                <div class="exercise-card" id="exercise-{{ .Exercise.ID }}">
                     <div class="ex-header">
                         <h3>{{ .Exercise.Name }}</h3>
                         <span class="order-badge">#{{ .Order }}</span>
@@ -20,9 +25,6 @@
 
                     <div class="ex-target">
                         Target: <strong>{{ .Sets }} Sets</strong> × <strong>{{ .Reps }} Reps</strong>
-                        {{ if .Notes }}
-                            <div class="note-tooltip"><i class="fas fa-info-circle"></i> {{ .Notes }}</div>
-                        {{ end }}
                     </div>
 
                     <div class="log-grid">
@@ -33,22 +35,48 @@
                             <span>Action</span>
                         </div>
 
-                        <form class="log-row-form"
-                              onsubmit="logSet(this);">
+                        {{ $exID := .Exercise.ID }}
+                        {{ $targetReps := .Reps }}
 
-                            <span class="set-num">1</span>
-                            <input type="number" name="reps" value="{{ .Reps }}" class="input-tiny">
-                            <input type="number" name="weight" placeholder="0" class="input-tiny">
-                            <input type="hidden" name="exercise_id" value="{{ .Exercise.ID }}">
+                        {{ range $setNum := .SetList }}
+                            {{ $log := $.Session.GetLog $exID $setNum }}
 
-                            <button type="submit" class="btn-check">
-                                <i class="fas fa-check"></i>
-                            </button>
-                        </form>
+                            <div id="row-{{ $exID }}-{{ $setNum }}" class="log-row-wrapper"
+                                 {{ if $log }}style="background-color: #e6fffa;"{{ end }}>
 
-                        {{ if gt .Sets 1 }}
-                            <div class="log-row-placeholder">
-                                <span>+ Remaining sets...</span>
+                                {{ if $.IsWatcher }}
+                                    <div class="read-only-row">
+                                        <span class="set-num">{{ $setNum }}</span>
+                                        <span class="val-reps">{{ if $log }}{{ $log.Reps }}{{ else }}--{{ end }}</span>
+                                        <span class="val-weight">{{ if $log }}{{ $log.Weight }}{{ else }}--{{ end }}</span>
+                                        <span class="val-status">
+                                            {{ if $log }}
+                                                <i class="fas fa-check-circle" style="color: #00b894;"></i>
+                                            {{ else }}
+                                                <i class="fas fa-hourglass-half" style="color: #b2bec3;"></i>
+                                            {{ end }}
+                                        </span>
+                                    </div>
+                                {{ else }}
+                                    <form class="log-row-form" onsubmit="logSet(this);">
+                                        <span class="set-num">{{ $setNum }}</span>
+
+                                        <input type="number" name="reps"
+                                               value="{{ if $log }}{{ $log.Reps }}{{ else }}{{ $targetReps }}{{ end }}"
+                                               class="input-tiny" {{ if $log }}disabled{{ end }}>
+
+                                        <input type="number" name="weight"
+                                               value="{{ if $log }}{{ $log.Weight }}{{ end }}"
+                                               placeholder="0" class="input-tiny" {{ if $log }}disabled{{ end }}>
+
+                                        <input type="hidden" name="exercise_id" value="{{ $exID }}">
+
+                                        <button type="submit" class="btn-check {{ if $log }}completed{{ end }}" {{ if $log }}disabled{{ end }}>
+                                            {{ if $log }}<i class="fas fa-check-double"></i>{{ else }}<i class="fas fa-check"></i>{{ end }}
+                                        </button>
+                                    </form>
+                                {{ end }}
+
                             </div>
                         {{ end }}
                     </div>
@@ -57,50 +85,88 @@
         </div>
 
         <div class="perform-footer">
-            <button class="btn-finish" onclick="window.location.href='/dashboard'">
-                <i class="fas fa-flag-checkered"></i> Finish Workout
-            </button>
+            {{ if not .IsWatcher }}
+                <button class="btn-finish" onclick="finishSession()">
+                    <i class="fas fa-flag-checkered"></i> Finish Workout
+                </button>
+            {{ else }}
+                <a href="/dashboard" class="btn-finish" style="background: #636e72;">Back to Dashboard</a>
+            {{ end }}
         </div>
     </div>
 
+    <style>
+        .read-only-row {
+            display: grid;
+            grid-template-columns: 0.5fr 1fr 1fr 0.8fr;
+            align-items: center;
+            text-align: center;
+            padding: 10px 0;
+            font-weight: bold;
+            color: #2d3436;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 5px;
+        }
+        .log-row-wrapper { margin-bottom: 5px; border-radius: 6px; }
+        .log-row-form { margin-bottom: 0; }
+        .btn-check.completed { background-color: #00b894; color: white; border: none; }
+    </style>
+
     <script>
-        // 1. Setup Connection
         const sessionID = "{{ .Session.ID }}";
+        const isWatcher = {{ .IsWatcher }};
         const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
-        const host = window.location.host;
-        const socketUrl = `${protocol}${host}/ws/session/${sessionID}`;
+        const socketUrl = `${protocol}${window.location.host}/ws/session/${sessionID}`;
 
-        console.log("Connecting to:", socketUrl);
         let socket = new WebSocket(socketUrl);
+        let timerInterval;
 
-        // 2. Handle Connection States
+        // --- 1. WebSocket Handlers ---
         socket.onopen = () => {
-            console.log("✅ WebSocket Connected");
             const badge = document.querySelector('.status-badge');
             if(badge) {
-                badge.innerText = "Live Connection";
+                badge.innerText = isWatcher ? "Live Feed" : "Live Connection";
                 badge.style.background = "#00b894";
             }
         };
 
-        socket.onclose = () => {
-            console.log("❌ WebSocket Disconnected");
-            const badge = document.querySelector('.status-badge');
-            if(badge) {
-                badge.innerText = "Offline";
-                badge.style.background = "#d63031";
+        socket.onmessage = (event) => {
+            const msg = JSON.parse(event.data);
+
+            // Handle Log Updates
+            if (msg.type === "log_set") {
+                updateUI(msg);
+            }
+            // Handle Finish Signal
+            else if (msg.type === "session_finished") {
+                stopTimer();
+                alert("Workout Completed by Member!");
+                document.querySelector('.status-badge').innerText = "Completed";
+                document.querySelector('.status-badge').style.background = "#2d3436";
             }
         };
 
-        socket.onerror = (err) => {
-            console.error("WS Error:", err);
-        };
+        function updateUI(data) {
+            const rowId = `row-${data.exercise_id}-${data.set_number}`;
+            const container = document.getElementById(rowId);
+            if (!container) return;
 
-        // 3. Send Data (Log Set)
+            if (isWatcher) {
+                const repsEl = container.querySelector('.val-reps');
+                const weightEl = container.querySelector('.val-weight');
+                const statusEl = container.querySelector('.val-status');
+
+                if(repsEl) repsEl.innerText = data.reps;
+                if(weightEl) weightEl.innerText = data.weight;
+                if(statusEl) statusEl.innerHTML = '<i class="fas fa-check-circle" style="color: #00b894;"></i>';
+
+                container.style.backgroundColor = "#b2f2bb";
+            }
+        }
+
         function logSet(form) {
-            event.preventDefault(); // Stop page reload
-
-            // Gather inputs
+            event.preventDefault();
             const exerciseID = parseInt(form.querySelector('input[name="exercise_id"]').value);
             const reps = parseInt(form.querySelector('input[name="reps"]').value);
             const weight = parseFloat(form.querySelector('input[name="weight"]').value) || 0;
@@ -114,29 +180,89 @@
                 weight: weight
             };
 
-            // Send
             if (socket.readyState === WebSocket.OPEN) {
                 socket.send(JSON.stringify(msg));
-
-                // UI Feedback
                 const btn = form.querySelector('.btn-check');
                 btn.classList.add('completed');
                 btn.innerHTML = '<i class="fas fa-check-double"></i>';
                 btn.disabled = true;
-            } else {
-                alert("Connection lost. Please refresh.");
+
+                // Disable inputs
+                form.querySelectorAll('input').forEach(i => i.disabled = true);
             }
         }
 
-        // 4. Timer
-        let seconds = 0;
-        setInterval(() => {
-            seconds++;
-            const date = new Date(0);
-            date.setSeconds(seconds);
-            const timeString = date.toISOString().substr(14, 5);
+        // --- 2. Synced Timer Logic ---
+        // We use the Server Start Time, not Client Time
+        const serverStart = new Date("{{ .Session.StartTime.Format "2006-01-02T15:04:05Z07:00" }}").getTime();
+
+        // Handle "Zero" time for EndTime if session is still running
+        const endTimeStr = "{{ .Session.EndTime.Format "2006-01-02T15:04:05Z07:00" }}";
+        const serverEnd = (endTimeStr.indexOf("0001-01-01") === -1) ? new Date(endTimeStr).getTime() : 0;
+
+        const sessionStatus = "{{ .Session.Status }}";
+
+        function startTimer() {
+            // FIX: If session is completed, show final duration and STOP.
+            if (sessionStatus === "completed" && serverEnd > 0) {
+                const diff = serverEnd - serverStart;
+                document.getElementById('session-timer').innerText = formatTime(diff);
+                document.getElementById('session-timer').style.color = "#00b894"; // Green
+
+                // Also update the badge immediately
+                const badge = document.querySelector('.status-badge');
+                if(badge) {
+                    badge.innerText = "Completed";
+                    badge.style.background = "#2d3436";
+                }
+                return;
+            }
+
+            timerInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const diff = now - serverStart;
+                document.getElementById('session-timer').innerText = formatTime(diff);
+            }, 1000);
+        }
+
+        function formatTime(ms) {
+            if (ms < 0) return "00:00";
+            const totalSeconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return (minutes < 10 ? "0" + minutes : minutes) + ":" +
+                (seconds < 10 ? "0" + seconds : seconds);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
             const timerEl = document.getElementById('session-timer');
-            if(timerEl) timerEl.innerText = timeString;
-        }, 1000);
+            if(timerEl) timerEl.style.color = "#00b894"; // Green text when done
+        }
+
+        startTimer();
+
+        // --- 3. Finish Workflow ---
+        function finishSession() {
+            if(!confirm("Are you sure you want to finish?")) return;
+
+            // 1. Notify Trainer via Socket FIRST
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({
+                    type: "session_finished",
+                    session_id: parseInt(sessionID)
+                }));
+            }
+
+            // 2. Call Backend to save and redirect
+            fetch(`/sessions/${sessionID}/finish`, { method: 'POST' })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/dashboard';
+                    } else {
+                        alert("Error finishing session");
+                    }
+                });
+        }
     </script>
 {{ end }}

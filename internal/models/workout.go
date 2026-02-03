@@ -31,3 +31,13 @@ type WorkoutExercise struct {
 	Notes    string `json:"notes"`    // e.g., "Rest 60s between sets"
 	Order    int    `json:"order"`    // To keep exercises in sequence (1, 2, 3...)
 }
+
+// SetList returns a slice of integers
+// This allows the template to loop over sets without a custom 'seq' function.
+func (we WorkoutExercise) SetList() []int {
+	var sets []int
+	for i := 1; i <= we.Sets; i++ {
+		sets = append(sets, i)
+	}
+	return sets
+}

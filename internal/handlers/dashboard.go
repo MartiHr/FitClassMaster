@@ -9,10 +9,14 @@ import (
 
 type DashboardHandler struct {
 	EnrollmentService *services.EnrollmentService
+	SessionService    *services.SessionService
 }
 
-func NewDashboardHandler(s *services.EnrollmentService) *DashboardHandler {
-	return &DashboardHandler{EnrollmentService: s}
+func NewDashboardHandler(s *services.EnrollmentService, ss *services.SessionService) *DashboardHandler {
+	return &DashboardHandler{
+		EnrollmentService: s,
+		SessionService:    ss,
+	}
 }
 
 func (h *DashboardHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
@@ -22,20 +26,35 @@ func (h *DashboardHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	username, _ := auth.GetUsernameFromSession(r)
+	role, _ := auth.GetUserRoleFromSession(r)
 
-	// Fetch only classes this user is enrolled in
-	myClasses, err := h.EnrollmentService.GetMySchedule(userID)
-	if err != nil {
-		// Handle database or service errors
-		http.Error(w, "Could not load your schedule", http.StatusInternalServerError)
-		return
+	data := map[string]any{
+		"Title":    "Dashboard | FitClassMaster",
+		"Username": username,
+		"Role":     role,
 	}
 
-	// Prepare data for the dashboard.gohtml template
-	data := map[string]any{
-		"Title":    "My Schedule | FitClassMaster",
-		"Username": username,  // Needed for "Welcome, {{.Username}}" in template
-		"Classes":  myClasses, // The slice of models.Class
+	// Fetch Classes
+	myClasses, err := h.EnrollmentService.GetMySchedule(userID)
+	if err == nil {
+		data["Classes"] = myClasses
+	}
+
+	// Fetch Live Sessions
+	if role == "trainer" || role == "admin" {
+		// Live
+		activeSessions, _ := h.SessionService.ListActiveSessions(role, userID)
+		data["ActiveSessions"] = activeSessions // This is why "Live" works
+
+		// Client History
+		clientHistory, _ := h.SessionService.GetTrainerHistory(userID)
+		data["ClientHistory"] = clientHistory
+	}
+
+	// Fetch Workout History (For Members)
+	history, err := h.SessionService.GetHistory(userID)
+	if err == nil {
+		data["History"] = history
 	}
 
 	templates.SmartRender(w, r, "dashboard", "", data)
