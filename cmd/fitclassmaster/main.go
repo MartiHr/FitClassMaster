@@ -140,10 +140,11 @@ func main() {
 
 		// Page to Create Plan
 		r.Get("/workout-plans/create", workoutH.CreatePage)
-		// HTMX Endpoint to get a new row
 		r.Get("/workout-plans/add-row", workoutH.AddExerciseRow)
-		// Form Submission
 		r.Post("/workout-plans/create", workoutH.CreatePost)
+
+		r.Get("/workout-plans/{id}/edit", workoutH.EditPage)
+		r.Post("/workout-plans/{id}/edit", workoutH.UpdatePost)
 	})
 
 	// Admin tier (Admin Only)

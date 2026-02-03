@@ -61,7 +61,7 @@ func (r *SessionRepo) GetActiveSessionsForTrainer(trainerID uint) ([]models.Work
 func (r *SessionRepo) GetActiveSessions() ([]models.WorkoutSession, error) {
 	var sessions []models.WorkoutSession
 	err := config.DB.
-		Preload("User"). // To show "John Doe is working out"
+		Preload("User").        // To show "John Doe is working out"
 		Preload("WorkoutPlan"). // To show "Leg Day"
 		Where("status = ?", "in_progress").
 		Order("start_time desc").

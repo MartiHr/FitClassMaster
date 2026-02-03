@@ -159,3 +159,30 @@
     background-color: #00a884;
     transform: translateY(-2px);
 }
+
+a.btn-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none; /* Removes the underline */
+    background-color: #636e72; /* Dark Grey color */
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+a.btn-edit:hover {
+    background-color: #2d3436; /* Darker on hover */
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Ensure the icon has some space */
+a.btn-edit i {
+    font-size: 0.9em;
+}

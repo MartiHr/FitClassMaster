@@ -52,3 +52,14 @@ func (r *WorkoutRepo) GetAll() ([]models.WorkoutPlan, error) {
 
 	return plans, err
 }
+
+// ClearExercises removes all exercise rows for a specific plan
+// Used when editing a plan (we delete old rows and re-insert new ones)
+func (r *WorkoutRepo) ClearExercises(planID uint) error {
+	return config.DB.Unscoped().Where("workout_plan_id = ?", planID).Delete(&models.WorkoutExercise{}).Error
+}
+
+// Update saves changes to the plan (Name, Notes, and new Exercises list)
+func (r *WorkoutRepo) Update(plan *models.WorkoutPlan) error {
+	return config.DB.Save(plan).Error
+}

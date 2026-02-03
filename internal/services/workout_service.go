@@ -3,6 +3,7 @@ package services
 import (
 	"FitClassMaster/internal/models"
 	"FitClassMaster/internal/repositories"
+	"strconv"
 )
 
 type WorkoutService struct {
@@ -41,7 +42,7 @@ func (s *WorkoutService) CreatePlan(name, description string, trainerID uint, ex
 			Notes:      ex.Notes,
 			Order:      i + 1, // Automatically set order based on list position
 		}
-		
+
 		plan.WorkoutExercises = append(plan.WorkoutExercises, link)
 	}
 
@@ -55,4 +56,47 @@ func (s *WorkoutService) GetFullDetails(id uint) (*models.WorkoutPlan, error) {
 
 func (s *WorkoutService) ListAll() ([]models.WorkoutPlan, error) {
 	return s.Repo.GetAll()
+}
+
+// UpdatePlan updates the plan metadata and replaces all exercises
+func (s *WorkoutService) UpdatePlan(planID uint, name, description string, exIDs, sets, reps, rowNotes []string) error {
+	// Get the plan
+	plan, err := s.Repo.GetByID(planID)
+	if err != nil {
+		return err
+	}
+
+	// Update Basic Info
+	plan.Name = name
+	plan.Description = description // Matches your Struct field
+
+	// Clear existing exercises
+	if err := s.Repo.ClearExercises(planID); err != nil {
+		return err
+	}
+
+	// Re-add Exercises from Form Data
+	var exercises []models.WorkoutExercise
+	for i, exIDStr := range exIDs {
+		exID, _ := strconv.ParseUint(exIDStr, 10, 32)
+		sVal, _ := strconv.Atoi(sets[i])
+		rVal, _ := strconv.Atoi(reps[i])
+
+		nVal := ""
+		if i < len(rowNotes) {
+			nVal = rowNotes[i]
+		}
+
+		exercises = append(exercises, models.WorkoutExercise{
+			WorkoutPlanID: planID,
+			ExerciseID:    uint(exID),
+			Sets:          sVal,
+			Reps:          rVal,
+			Notes:         nVal, // This belongs to WorkoutExercise
+			Order:         i + 1,
+		})
+	}
+
+	plan.WorkoutExercises = exercises
+	return s.Repo.Update(plan)
 }

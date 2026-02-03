@@ -2,10 +2,13 @@ package handlers
 
 import (
 	"FitClassMaster/internal/auth"
+	"FitClassMaster/internal/models"
 	"FitClassMaster/internal/services"
 	"FitClassMaster/internal/templates"
 	"net/http"
 	"strconv"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type WorkoutHandler struct {
@@ -27,17 +30,6 @@ func (h *WorkoutHandler) CreatePage(w http.ResponseWriter, r *http.Request) {
 		"Exercises": exercises,
 	}
 	templates.SmartRender(w, r, "workout_create", "", data)
-}
-
-// AddExerciseRow returns ONE HTML row for the exercise list (HTMX endpoint)
-func (h *WorkoutHandler) AddExerciseRow(w http.ResponseWriter, r *http.Request) {
-	exercises, _ := h.ExerciseService.GetAll()
-
-	data := map[string]any{
-		"Exercises": exercises,
-	}
-	// Render ONLY the "row" fragment, not the whole page layout
-	templates.SmartRender(w, r, "workout_create", "exercise-row", data)
 }
 
 // CreatePost handles the form submission
@@ -96,7 +88,7 @@ func (h *WorkoutHandler) List(w http.ResponseWriter, r *http.Request) {
 
 	// Check Role for UI elements (Show "Create" button?)
 	role, _ := auth.GetUserRoleFromSession(r)
-	canManage := (role == "trainer" || role == "admin")
+	canManage := (role == models.RoleTrainer || role == models.RoleAdmin)
 
 	data := map[string]any{
 		"Title":     "Workout Plans",
@@ -125,7 +117,7 @@ func (h *WorkoutHandler) DetailsPage(w http.ResponseWriter, r *http.Request) {
 
 	// Determine Permissions (For "Edit/Delete" buttons)
 	role, _ := auth.GetUserRoleFromSession(r)
-	canManage := (role == "trainer" || role == "admin")
+	canManage := (role == models.RoleTrainer || role == models.RoleAdmin)
 
 	data := map[string]any{
 		"Title":     plan.Name,
@@ -134,4 +126,89 @@ func (h *WorkoutHandler) DetailsPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	templates.SmartRender(w, r, "workout_plan_details", "", data)
+}
+
+// EditPage renders the form pre-filled with existing data
+func (h *WorkoutHandler) EditPage(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, _ := strconv.ParseUint(idStr, 10, 32)
+
+	// Get the plan with details
+	plan, err := h.Service.GetFullDetails(uint(id))
+	if err != nil {
+		http.Error(w, "Plan not found", http.StatusNotFound)
+		return
+	}
+
+	// Get all exercises for dropdowns
+	// Usage: h.ExerciseService.GetAll (Matches your ExerciseService)
+	allExercises, _ := h.ExerciseService.GetAll()
+
+	// Prepare row data for the template loop
+	var rowData []map[string]any
+	for _, we := range plan.WorkoutExercises {
+		rowData = append(rowData, map[string]any{
+			"Order":      we.Order,
+			"SelectedID": we.ExerciseID, // Pre-selects the dropdown
+			"Exercises":  allExercises,  // Passes the list to every row
+			"Sets":       we.Sets,
+			"Reps":       we.Reps,
+			"Notes":      we.Notes,
+		})
+	}
+
+	data := map[string]any{
+		"Title":     "Edit Workout Plan",
+		"IsEdit":    true, // Toggles the form action to /edit
+		"Plan":      plan,
+		"Exercises": allExercises, // For the "Add Row" button
+		"Rows":      rowData,      // For the existing rows loop
+	}
+
+	templates.SmartRender(w, r, "workout_create", "", data)
+}
+
+// UpdatePost handles the form submission when editing a plan
+func (h *WorkoutHandler) UpdatePost(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, _ := strconv.ParseUint(idStr, 10, 32)
+
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	// Capture Basic Info
+	name := r.FormValue("name")
+	description := r.FormValue("description")
+
+	// Capture Arrays (The exercise rows)
+	exIDs := r.Form["exercise_id[]"]
+	sets := r.Form["sets[]"]
+	reps := r.Form["reps[]"]
+	rowNotes := r.Form["notes[]"]
+
+	// Call Service to update
+	err = h.Service.UpdatePlan(uint(id), name, description, exIDs, sets, reps, rowNotes)
+	if err != nil {
+		http.Error(w, "Failed to update plan", http.StatusInternalServerError)
+		return
+	}
+
+	// Redirect back to list
+	http.Redirect(w, r, "/workout-plans", http.StatusSeeOther)
+}
+
+// AddExerciseRow handles HTMX requests
+func (h *WorkoutHandler) AddExerciseRow(w http.ResponseWriter, r *http.Request) {
+	exercises, _ := h.ExerciseService.GetAll()
+
+	data := map[string]any{
+		"Exercises": exercises,
+		"Sets":      3,
+		"Reps":      10,
+	}
+
+	templates.SmartRender(w, r, "workout_create", "exercise-row", data)
 }

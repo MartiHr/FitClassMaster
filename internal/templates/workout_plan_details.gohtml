@@ -8,9 +8,9 @@
             <div class="title-row">
                 <h1>{{ .Plan.Name }}</h1>
                 {{ if .CanManage }}
-                    <button class="btn-edit" disabled title="Coming Soon">
+                    <a href="/workout-plans/{{ .Plan.ID }}/edit" class="btn-edit">
                         <i class="fas fa-pencil-alt"></i> Edit Plan
-                    </button>
+                    </a>
                 {{ end }}
             </div>
 
