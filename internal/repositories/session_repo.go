@@ -61,7 +61,7 @@ func (r *SessionRepo) GetActiveSessionsForTrainer(trainerID uint) ([]models.Work
 func (r *SessionRepo) GetActiveSessions() ([]models.WorkoutSession, error) {
 	var sessions []models.WorkoutSession
 	err := config.DB.
-		Preload("User").        // To show "John Doe is working out"
+		Preload("User"). // To show "John Doe is working out"
 		Preload("WorkoutPlan"). // To show "Leg Day"
 		Where("status = ?", "in_progress").
 		Order("start_time desc").
@@ -92,4 +92,16 @@ func (r *SessionRepo) GetRecentCompletedForTrainer(trainerID uint) ([]models.Wor
 		Limit(5).
 		Find(&sessions).Error
 	return sessions, err
+}
+
+func (r *SessionRepo) GetActiveByUserID(userID uint) (*models.WorkoutSession, error) {
+	var session models.WorkoutSession
+
+	// We look for status 'in_progress'
+	err := config.DB.
+		Preload("WorkoutPlan").
+		Where("user_id = ? AND status = ?", userID, "in_progress").
+		First(&session).Error
+
+	return &session, err
 }

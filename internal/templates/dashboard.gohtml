@@ -1,5 +1,18 @@
 {{ define "content" }}
     <div class="dashboard-container">
+
+        {{ if .CurrentSession }}
+            <div class="resume-banner">
+                <div class="resume-info">
+                    <h2><i class="fas fa-pulse" style="color: #fab1a0;"></i> Workout in Progress</h2>
+                    <p>You have an unfinished session: <strong>{{ .CurrentSession.WorkoutPlan.Name }}</strong></p>
+                    <p class="time-started">Started at {{ .CurrentSession.StartTime.Format "15:04" }}</p>
+                </div>
+                <a href="/sessions/{{ .CurrentSession.ID }}/perform" class="btn-resume">
+                    Resume Workout <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        {{ end }}
         <div class="dashboard-header">
             <h1>Welcome, {{ .Username }}!</h1>
             <p>Manage your upcoming sessions and track your schedule.</p>

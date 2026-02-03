@@ -137,3 +137,57 @@ func (h *ClassHandler) Cancel(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/classes", http.StatusSeeOther)
 }
+
+// EditPage renders the form with existing class data
+func (h *ClassHandler) EditPage(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, _ := strconv.ParseUint(idStr, 10, 32)
+
+	class, err := h.ClassService.GetFullDetails(uint(id))
+	if err != nil {
+		http.Error(w, "Class not found", http.StatusNotFound)
+		return
+	}
+
+	data := map[string]any{
+		"Title": "Edit Class",
+		"Class": class,
+		// We need to format the time specifically for the HTML <input type="datetime-local">
+		"FormattedStart": class.StartTime.Format("2006-01-02T15:04"),
+		"FormattedEnd":   class.StartTime.Add(time.Duration(class.Duration) * time.Minute).Format("2006-01-02T15:04"),
+	}
+	templates.SmartRender(w, r, "class_edit", "", data)
+}
+
+// UpdatePost processes the changes
+func (h *ClassHandler) UpdatePost(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, _ := strconv.ParseUint(idStr, 10, 32)
+
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	// Parse Fields
+	name := r.FormValue("name")
+	desc := r.FormValue("description")
+	diff := r.FormValue("difficulty")
+	cap, _ := strconv.Atoi(r.FormValue("capacity"))
+
+	// Time Calculation
+	layout := "2006-01-02T15:04"
+	start, _ := time.Parse(layout, r.FormValue("start_time"))
+	end, _ := time.Parse(layout, r.FormValue("end_time"))
+	duration := int(end.Sub(start).Minutes())
+
+	// Call Service
+	err = h.ClassService.UpdateClass(uint(id), name, desc, diff, start, duration, cap)
+	if err != nil {
+		http.Error(w, "Failed to update class", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/classes", http.StatusSeeOther)
+}

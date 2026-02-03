@@ -14,6 +14,7 @@ type WorkoutPlan struct {
 	Trainer   User `gorm:"foreignKey:TrainerID" json:"trainer"`
 
 	WorkoutExercises []WorkoutExercise `gorm:"foreignKey:WorkoutPlanID" json:"workout_exercises"`
+	DeletedAt        gorm.DeletedAt    `gorm:"index"`
 }
 
 // WorkoutExercise is the link between a Plan and an Exercise

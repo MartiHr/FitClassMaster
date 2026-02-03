@@ -43,3 +43,7 @@ func (r *ClassRepo) Create(class *models.Class) error {
 func (r *ClassRepo) Delete(id uint) error {
 	return config.DB.Delete(&models.Class{}, id).Error
 }
+
+func (r *ClassRepo) Update(class *models.Class) error {
+	return config.DB.Save(class).Error
+}

@@ -1,0 +1,56 @@
+{{ define "content" }}
+    <div class="class-create-container">
+        <div class="header-section">
+            <h1><i class="fas fa-edit"></i> Edit Class</h1>
+        </div>
+
+        <form action="/classes/{{ .Class.ID }}/edit" method="POST" class="create-form">
+            <div class="form-section">
+                <div class="form-group">
+                    <label>Class Name</label>
+                    <input type="text" name="name" value="{{ .Class.Name }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" rows="3">{{ .Class.Description }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Difficulty</label>
+                    <select name="difficulty">
+                        <option value="Beginner" {{ if eq .Class.DifficultyLevel "Beginner" }}selected{{ end }}>Beginner</option>
+                        <option value="Intermediate" {{ if eq .Class.DifficultyLevel "Intermediate" }}selected{{ end }}>Intermediate</option>
+                        <option value="Advanced" {{ if eq .Class.DifficultyLevel "Advanced" }}selected{{ end }}>Advanced</option>
+                        <option value="Expert" {{ if eq .Class.DifficultyLevel "Expert" }}selected{{ end }}>Expert</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="time-grid">
+                    <div class="form-group">
+                        <label>Start Time</label>
+                        <input type="datetime-local" name="start_time" value="{{ .FormattedStart }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>End Time</label>
+                        <input type="datetime-local" name="end_time" value="{{ .FormattedEnd }}" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Capacity</label>
+                    <input type="number" name="capacity" value="{{ .Class.MaxCapacity }}" required>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="/classes" class="btn-cancel">Cancel Changes</a>
+                <button type="submit" class="btn-save">Update Class</button>
+            </div>
+        </form>
+    </div>
+
+    <link rel="stylesheet" href="/static/css/class_create.css">
+{{ end }}

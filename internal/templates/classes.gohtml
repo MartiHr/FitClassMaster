@@ -42,6 +42,21 @@
                                 Enroll Now
                             </button>
                         {{ end }}
+
+                        {{ if or (eq $.UserRole "trainer") (eq $.UserRole "admin") }}
+                            <div class="trainer-actions" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; display: flex; gap: 10px;">
+
+                                <a href="/classes/{{ .Class.ID }}/edit" class="btn-edit-small" style="color: #0984e3; text-decoration: none; font-weight: bold; font-size: 0.9rem;">
+                                    <i class="fas fa-pencil-alt"></i> Edit
+                                </a>
+
+                                <form action="/classes/{{ .Class.ID }}/cancel" method="POST" onsubmit="return confirm('Cancel this class? This will remove it for all enrolled members.');" style="display:inline;">
+                                    <button type="submit" style="background: none; border: none; color: #d63031; font-weight: bold; cursor: pointer; font-size: 0.9rem;">
+                                        <i class="fas fa-trash"></i> Cancel
+                                    </button>
+                                </form>
+                            </div>
+                        {{ end }}
                     </div>
                 </div>
             {{ else }}

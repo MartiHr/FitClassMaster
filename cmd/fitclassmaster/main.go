@@ -140,16 +140,17 @@ func main() {
 		r.Post("/exercises", exerciseH.Create)
 		r.Delete("/exercises/{id}", exerciseH.Delete)
 
-		// Page to Create Plan
 		r.Get("/workout-plans/create", workoutH.CreatePage)
 		r.Get("/workout-plans/add-row", workoutH.AddExerciseRow)
 		r.Post("/workout-plans/create", workoutH.CreatePost)
-
 		r.Get("/workout-plans/{id}/edit", workoutH.EditPage)
 		r.Post("/workout-plans/{id}/edit", workoutH.UpdatePost)
+		r.Post("/workout-plans/{id}/delete", workoutH.DeletePost)
 
 		r.Get("/classes/create", classH.CreatePage)
 		r.Post("/classes/create", classH.CreatePost)
+		r.Get("/classes/{id}/edit", classH.EditPage)
+		r.Post("/classes/{id}/edit", classH.UpdatePost)
 		r.Post("/classes/{id}/cancel", classH.Cancel)
 	})
 

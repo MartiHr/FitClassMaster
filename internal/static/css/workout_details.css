@@ -186,3 +186,31 @@ a.btn-edit:hover {
 a.btn-edit i {
     font-size: 0.9em;
 }
+
+.details-container .action-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Red Delete Button */
+.details-container .btn-delete {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #ff7675; /* Soft Red */
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    text-decoration: none;
+}
+
+.details-container .btn-delete:hover {
+    background-color: #d63031; /* Darker Red */
+    transform: translateY(-1px);
+}

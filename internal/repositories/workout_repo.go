@@ -63,3 +63,8 @@ func (r *WorkoutRepo) ClearExercises(planID uint) error {
 func (r *WorkoutRepo) Update(plan *models.WorkoutPlan) error {
 	return config.DB.Save(plan).Error
 }
+
+// Delete performs a Soft Delete (Update) so FK constraints don't break
+func (r *WorkoutRepo) Delete(id uint) error {
+	return config.DB.Delete(&models.WorkoutPlan{}, id).Error
+}

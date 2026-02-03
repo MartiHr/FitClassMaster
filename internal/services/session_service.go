@@ -67,3 +67,8 @@ func (s *SessionService) GetHistory(userID uint) ([]models.WorkoutSession, error
 func (s *SessionService) GetTrainerHistory(trainerID uint) ([]models.WorkoutSession, error) {
 	return s.Repo.GetRecentCompletedForTrainer(trainerID)
 }
+
+// GetActiveSession checks if the specific user has an unfinished workout
+func (s *SessionService) GetActiveSession(userID uint) (*models.WorkoutSession, error) {
+	return s.Repo.GetActiveByUserID(userID)
+}

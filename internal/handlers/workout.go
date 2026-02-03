@@ -212,3 +212,18 @@ func (h *WorkoutHandler) AddExerciseRow(w http.ResponseWriter, r *http.Request) 
 
 	templates.SmartRender(w, r, "workout_create", "exercise-row", data)
 }
+
+// DeletePost handles the form submission to delete a plan
+func (h *WorkoutHandler) DeletePost(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, _ := strconv.ParseUint(idStr, 10, 32)
+
+	// Call the service
+	if err := h.Service.DeletePlan(uint(id)); err != nil {
+		http.Error(w, "Failed to delete plan", http.StatusInternalServerError)
+		return
+	}
+
+	// Redirect to the list because this page no longer exists
+	http.Redirect(w, r, "/workout-plans", http.StatusSeeOther)
+}

@@ -34,6 +34,12 @@ func (h *DashboardHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 		"Role":     role,
 	}
 
+	// Check for interrupted session to show the Resume Banner
+	activeSession, err := h.SessionService.GetActiveSession(userID)
+	if err == nil && activeSession.ID != 0 {
+		data["CurrentSession"] = activeSession
+	}
+
 	// Fetch Classes
 	myClasses, err := h.EnrollmentService.GetMySchedule(userID)
 	if err == nil {

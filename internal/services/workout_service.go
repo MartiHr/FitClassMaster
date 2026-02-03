@@ -100,3 +100,7 @@ func (s *WorkoutService) UpdatePlan(planID uint, name, description string, exIDs
 	plan.WorkoutExercises = exercises
 	return s.Repo.Update(plan)
 }
+
+func (s *WorkoutService) DeletePlan(id uint) error {
+	return s.Repo.Delete(id)
+}

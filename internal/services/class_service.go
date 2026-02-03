@@ -66,3 +66,22 @@ func (s *ClassService) CreateClass(name, description, difficulty string, trainer
 func (s *ClassService) CancelClass(id uint) error {
 	return s.Repo.Delete(id)
 }
+
+// UpdateClass modifies an existing class
+func (s *ClassService) UpdateClass(id uint, name, description, difficulty string, start time.Time, durationMinutes int, capacity int) error {
+	// Get the existing class
+	class, err := s.Repo.GetByID(id)
+	if err != nil {
+		return err
+	}
+
+	// Update fields
+	class.Name = name
+	class.Description = description
+	class.DifficultyLevel = difficulty
+	class.StartTime = start
+	class.Duration = durationMinutes
+	class.MaxCapacity = capacity
+
+	return s.Repo.Update(class)
+}
