@@ -64,7 +64,7 @@
 
 /* Header/Body/Footer Structure from your HTML */
 .class-card__header {
-    background: #f8f9fa;
+    /*background: #f8f9fa;*/
     padding: 1rem;
     display: flex;
     align-items: center;

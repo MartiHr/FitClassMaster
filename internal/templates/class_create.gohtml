@@ -1,0 +1,65 @@
+{{ define "content" }}
+    <div class="class-create-container">
+        <div class="header-section">
+            <h1><i class="fas fa-calendar-plus"></i> Schedule New Class</h1>
+            <p>Create a session for members to enroll in.</p>
+        </div>
+
+        <form action="/classes/create" method="POST" class="create-form">
+            <div class="form-section">
+                <h3>Class Details</h3>
+
+                <div class="form-group">
+                    <label for="name">Class Name</label>
+                    <input type="text" id="name" name="name" placeholder="e.g. Morning HIIT Blast" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" rows="3" placeholder="What will they be doing in this session?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="difficulty">Difficulty Level</label>
+                    <div class="select-wrapper">
+                        <select id="difficulty" name="difficulty" required>
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate" selected>Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                            <option value="Expert">Expert</option>
+                        </select>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Schedule & Capacity</h3>
+
+                <div class="time-grid">
+                    <div class="form-group">
+                        <label for="start_time">Start Time</label>
+                        <input type="datetime-local" id="start_time" name="start_time" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="end_time">End Time</label>
+                        <input type="datetime-local" id="end_time" name="end_time" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="capacity">Max Capacity</label>
+                    <input type="number" id="capacity" name="capacity" value="20" min="1" required>
+                    <span class="help-text">Maximum number of students allowed to enroll.</span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="/classes" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-save">
+                    <i class="fas fa-check"></i> Publish Class
+                </button>
+            </div>
+        </form>
+    </div>
+{{ end }}

@@ -4,6 +4,7 @@ import (
 	"FitClassMaster/internal/config"
 	"FitClassMaster/internal/models"
 	"FitClassMaster/internal/repositories"
+	"time"
 )
 
 type ClassService struct {
@@ -47,4 +48,21 @@ func (s *ClassService) GetClassesForUser(userID uint) ([]map[string]interface{},
 
 func (s *ClassService) GetFullDetails(classID uint) (*models.Class, error) {
 	return s.Repo.GetWithDetails(classID)
+}
+
+func (s *ClassService) CreateClass(name, description, difficulty string, trainerID uint, start time.Time, durationMinutes int, capacity int) error {
+	class := &models.Class{
+		Name:            name,
+		Description:     description,
+		DifficultyLevel: difficulty,
+		TrainerID:       trainerID,
+		StartTime:       start,
+		Duration:        durationMinutes,
+		MaxCapacity:     capacity,
+	}
+	return s.Repo.Create(class)
+}
+
+func (s *ClassService) CancelClass(id uint) error {
+	return s.Repo.Delete(id)
 }

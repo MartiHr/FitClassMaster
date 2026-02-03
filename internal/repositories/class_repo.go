@@ -33,3 +33,13 @@ func (r *ClassRepo) GetWithDetails(id uint) (*models.Class, error) {
 
 	return &class, err
 }
+
+// Create saves a new class schedule
+func (r *ClassRepo) Create(class *models.Class) error {
+	return config.DB.Create(class).Error
+}
+
+// Delete cancels a class
+func (r *ClassRepo) Delete(id uint) error {
+	return config.DB.Delete(&models.Class{}, id).Error
+}

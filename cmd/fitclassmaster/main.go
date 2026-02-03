@@ -147,6 +147,10 @@ func main() {
 
 		r.Get("/workout-plans/{id}/edit", workoutH.EditPage)
 		r.Post("/workout-plans/{id}/edit", workoutH.UpdatePost)
+
+		r.Get("/classes/create", classH.CreatePage)
+		r.Post("/classes/create", classH.CreatePost)
+		r.Post("/classes/{id}/cancel", classH.Cancel)
 	})
 
 	// Admin tier (Admin Only)

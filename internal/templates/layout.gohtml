@@ -21,6 +21,7 @@
         <link rel="stylesheet" href="/static/css/workout_details.css">
         <link rel="stylesheet" href="/static/css/perform.css">
         <link rel="stylesheet" href="/static/css/admin_users.css">
+        <link rel="stylesheet" href="/static/css/class_create.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
@@ -37,6 +38,12 @@
                     <a href="/workout-plans">Workouts</a>
                     <a href="/exercises">Exercises</a>
                     <a href="/profile">Profile</a>
+
+                    {{ if eq .UserRole "admin" }}
+                        <a href="/admin/users" style="color: #f1c40f;">
+                            <i class="fas fa-users-cog"></i> Users
+                        </a>
+                    {{ end }}
                 {{ end }}
                 <a href="/about">About</a>
             </div>

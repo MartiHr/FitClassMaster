@@ -1,8 +1,15 @@
 {{ define "content" }}
     <div class="classes-container">
         <div class="classes-header">
-            <h1><i class="fas fa-calendar-alt"></i> Available Classes</h1>
-            <p>Browse our current schedule and book your next session.</p>
+            <div class="text-content">
+                <h1><i class="fas fa-calendar-alt"></i> Available Classes</h1>
+                <p>Browse our current schedule and book your next session.</p>
+            </div>
+            {{ if or (eq .UserRole "trainer") (eq .UserRole "admin") }}
+                <a href="/classes/create" class="btn-create" style="background: #0984e3; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                    <i class="fas fa-plus"></i> Schedule Class
+                </a>
+            {{ end }}
         </div>
 
         <div class="class-grid">
