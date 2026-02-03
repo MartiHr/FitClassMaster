@@ -72,19 +72,21 @@ func main() {
 	go hub.Run() // Run the hub in a separate goroutine
 
 	// Handlers
-	authH := handlers.NewAuthHandler(authService)
-	userH := handlers.NewUserHandler(userService)
-	classH := handlers.NewClassHandler(classService, enrollService)
-	enrollH := handlers.NewEnrollmentHandler(enrollService)
-	dashboardH := handlers.NewDashboardHandler(enrollService, sessionService)
-	exerciseH := handlers.NewExerciseHandler(exerciseService)
-	workoutH := handlers.NewWorkoutHandler(workoutService, exerciseService)
-	sessionH := handlers.NewSessionHandler(sessionService)
 
 	homeH := handlers.NewHomeHandler()
 	aboutH := handlers.NewAboutHandler()
 
+	authH := handlers.NewAuthHandler(authService)
+	userH := handlers.NewUserHandler(userService)
+	enrollH := handlers.NewEnrollmentHandler(enrollService)
+	sessionH := handlers.NewSessionHandler(sessionService)
+	exerciseH := handlers.NewExerciseHandler(exerciseService)
+	adminH := handlers.NewAdminHandler(userService)
 	wsHandler := handlers.NewWSHandler(hub)
+
+	workoutH := handlers.NewWorkoutHandler(workoutService, exerciseService)
+	classH := handlers.NewClassHandler(classService, enrollService)
+	dashboardH := handlers.NewDashboardHandler(enrollService, sessionService)
 
 	// Public routes
 	r.Group(func(r chi.Router) {
@@ -152,9 +154,9 @@ func main() {
 		r.Use(middlewares.RequireAuth)
 		r.Use(middlewares.RequireRole(models.RoleAdmin))
 
-		// r.Get("/admin/users", adminH.ManageUsers)
-		// r.Get("/admin", adminHandler)
-
+		r.Get("/admin/users", adminH.ManageUsers)
+		r.Post("/admin/users/{id}/role", adminH.ToggleRole)
+		r.Post("/admin/users/{id}/delete", adminH.DeleteUser)
 	})
 
 	// Run server

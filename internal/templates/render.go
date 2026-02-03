@@ -84,6 +84,10 @@ func SmartRender(w http.ResponseWriter, r *http.Request, page string, fragment s
 		m["Username"] = username
 	}
 
+	if role, ok := auth.GetUserRoleFromSession(r); ok {
+		m["UserRole"] = role
+	}
+
 	isHTMX := r.Header.Get("HX-Request") == "true"
 	if isHTMX && fragment != "" {
 		renderFragment(w, page, fragment, m)

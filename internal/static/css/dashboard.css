@@ -62,7 +62,7 @@
     box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Added hover shadow */
 }
 
-[cite_start]/* Header/Body/Footer Structure from your HTML [cite: 3, 4, 7] */
+/* Header/Body/Footer Structure from your HTML */
 .class-card__header {
     background: #f8f9fa;
     padding: 1rem;
@@ -265,8 +265,8 @@
     background: white;
     padding: 1rem;
     border-radius: 8px;
-    border: 1px solid #dfe6e9; [cite_start]/* Matches your class-card border [cite: 3] */
-transition: transform 0.2s, border-color 0.2s;
+    border: 1px solid #dfe6e9; /* Matches your class-card border */
+    transition: transform 0.2s, border-color 0.2s;
 }
 
 .history-card:hover {
@@ -279,8 +279,8 @@ transition: transform 0.2s, border-color 0.2s;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: #f8f9fa; [cite_start]/* Matches card header bg [cite: 3] */
-padding: 10px;
+    background: #f8f9fa; /* Matches card header bg */
+    padding: 10px;
     border-radius: 8px;
     min-width: 60px;
     margin-right: 1.5rem;

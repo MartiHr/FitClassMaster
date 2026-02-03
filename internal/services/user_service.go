@@ -41,3 +41,19 @@ func (s *UserService) ChangePassword(userID uint, currentPwd, newPwd string) err
 
 	return s.Repo.UpdatePassword(userID, string(hash))
 }
+
+func (s *UserService) ListAllUsers() ([]models.User, error) {
+	return s.Repo.GetAll()
+}
+
+func (s *UserService) PromoteUser(userID uint) error {
+	return s.Repo.UpdateRole(userID, models.RoleTrainer)
+}
+
+func (s *UserService) DemoteUser(userID uint) error {
+	return s.Repo.UpdateRole(userID, models.RoleMember)
+}
+
+func (s *UserService) DeleteUser(userID uint) error {
+	return s.Repo.Delete(userID)
+}

@@ -58,3 +58,20 @@ func (r *UserRepo) UpdateInfo(id uint, firstName, lastName string) error {
 func (r *UserRepo) UpdatePassword(id uint, hashedPwd string) error {
 	return config.DB.Model(&models.User{}).Where("id = ?", id).Update("password", hashedPwd).Error
 }
+
+// GetAll fetches every user in the system, ordered by newest first
+func (r *UserRepo) GetAll() ([]models.User, error) {
+	var users []models.User
+	err := config.DB.Order("created_at desc").Find(&users).Error
+	return users, err
+}
+
+// UpdateRole changes a user's role (e.g., "member" -> "trainer")
+func (r *UserRepo) UpdateRole(userID uint, newRole models.Role) error {
+	return config.DB.Model(&models.User{}).Where("id = ?", userID).Update("role", newRole).Error
+}
+
+// Delete removes a user permanently
+func (r *UserRepo) Delete(userID uint) error {
+	return config.DB.Unscoped().Delete(&models.User{}, userID).Error
+}

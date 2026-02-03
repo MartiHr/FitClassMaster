@@ -84,3 +84,21 @@ nav button {
 nav button:hover {
     opacity: 0.9;
 }
+
+/* --- Role-Based Navbar Variants --- */
+header.nav-trainer {
+    background: linear-gradient(135deg, #0984e3, #6c5ce7);
+    border-bottom: 4px solid #74b9ff;
+}
+
+header.nav-admin {
+    background: linear-gradient(135deg, #2d3436, #000000); /* Dark base */
+    border-bottom: 4px solid #f1c40f; /* Gold accent border */
+}
+
+header.nav-admin nav a {
+    color: #f1c40f;
+}
+header.nav-admin .nav-links a:hover {
+    color: white;
+}
