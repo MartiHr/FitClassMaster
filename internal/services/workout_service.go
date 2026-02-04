@@ -6,15 +6,17 @@ import (
 	"strconv"
 )
 
+// WorkoutService manages the creation and updating of workout plans.
 type WorkoutService struct {
 	Repo *repositories.WorkoutRepo
 }
 
+// NewWorkoutService creates a new instance of WorkoutService.
 func NewWorkoutService(repo *repositories.WorkoutRepo) *WorkoutService {
 	return &WorkoutService{Repo: repo}
 }
 
-// ExerciseInput represents one row in the "Add Workout" form
+// ExerciseInput represents a single exercise row within a workout plan creation form.
 type ExerciseInput struct {
 	ExerciseID uint
 	Sets       int
@@ -22,60 +24,61 @@ type ExerciseInput struct {
 	Notes      string
 }
 
-// CreatePlan constructs the full object graph and saves it
+// CreatePlan initializes and persists a new workout plan with its associated exercises.
 func (s *WorkoutService) CreatePlan(name, description string, trainerID uint, exercises []ExerciseInput) error {
-
-	// Create the Parent Plan
+	// Initialize the workout plan object.
 	plan := models.WorkoutPlan{
 		Name:             name,
 		Description:      description,
 		TrainerID:        trainerID,
-		WorkoutExercises: []models.WorkoutExercise{}, // Initialize slice
+		WorkoutExercises: []models.WorkoutExercise{},
 	}
 
-	// Loop through inputs and create the Child objects
+	// Map inputs to the WorkoutExercise model.
 	for i, ex := range exercises {
 		link := models.WorkoutExercise{
 			ExerciseID: ex.ExerciseID,
 			Sets:       ex.Sets,
 			Reps:       ex.Reps,
 			Notes:      ex.Notes,
-			Order:      i + 1, // Automatically set order based on list position
+			Order:      i + 1, // Automatically maintain sequence order.
 		}
 
 		plan.WorkoutExercises = append(plan.WorkoutExercises, link)
 	}
 
-	// Save everything at once using the Repo
+	// Persist the entire plan graph.
 	return s.Repo.Create(&plan)
 }
 
+// GetFullDetails retrieves a workout plan by its ID with all exercises preloaded.
 func (s *WorkoutService) GetFullDetails(id uint) (*models.WorkoutPlan, error) {
 	return s.Repo.GetByID(id)
 }
 
+// ListAll retrieves all workout plans available in the system.
 func (s *WorkoutService) ListAll() ([]models.WorkoutPlan, error) {
 	return s.Repo.GetAll()
 }
 
-// UpdatePlan updates the plan metadata and replaces all exercises
+// UpdatePlan modifies an existing workout plan and replaces its exercise list.
 func (s *WorkoutService) UpdatePlan(planID uint, name, description string, exIDs, sets, reps, rowNotes []string) error {
-	// Get the plan
+	// Retrieve the existing plan.
 	plan, err := s.Repo.GetByID(planID)
 	if err != nil {
 		return err
 	}
 
-	// Update Basic Info
+	// Update metadata.
 	plan.Name = name
-	plan.Description = description // Matches your Struct field
+	plan.Description = description
 
-	// Clear existing exercises
+	// Remove old exercise associations.
 	if err := s.Repo.ClearExercises(planID); err != nil {
 		return err
 	}
 
-	// Re-add Exercises from Form Data
+	// Rebuild the exercise list from the provided form data.
 	var exercises []models.WorkoutExercise
 	for i, exIDStr := range exIDs {
 		exID, _ := strconv.ParseUint(exIDStr, 10, 32)
@@ -92,7 +95,7 @@ func (s *WorkoutService) UpdatePlan(planID uint, name, description string, exIDs
 			ExerciseID:    uint(exID),
 			Sets:          sVal,
 			Reps:          rVal,
-			Notes:         nVal, // This belongs to WorkoutExercise
+			Notes:         nVal,
 			Order:         i + 1,
 		})
 	}
@@ -101,6 +104,7 @@ func (s *WorkoutService) UpdatePlan(planID uint, name, description string, exIDs
 	return s.Repo.Update(plan)
 }
 
+// DeletePlan removes a workout plan from the system.
 func (s *WorkoutService) DeletePlan(id uint) error {
 	return s.Repo.Delete(id)
 }

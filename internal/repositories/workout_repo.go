@@ -7,44 +7,44 @@ import (
 	"gorm.io/gorm"
 )
 
+// WorkoutRepo handles database operations for WorkoutPlans and WorkoutExercises.
 type WorkoutRepo struct{}
 
+// NewWorkoutRepo creates a new instance of WorkoutRepo.
 func NewWorkoutRepo() *WorkoutRepo {
 	return &WorkoutRepo{}
 }
 
-// CreateWithExercises saves the plan AND all its exercise links in one transaction
+// Create inserts a new workout plan and its associated exercises in one transaction.
 func (r *WorkoutRepo) Create(plan *models.WorkoutPlan) error {
 	return config.DB.Create(plan).Error
 }
 
-// GetByID fetches a plan and preloads the exercises + the specific sets/reps info
+// GetByID retrieves a workout plan by its ID, preloading trainer and exercise details.
 func (r *WorkoutRepo) GetByID(id uint) (*models.WorkoutPlan, error) {
 	var plan models.WorkoutPlan
 	err := config.DB.
 		Preload("Trainer").
-		// Preload the link table (WorkoutExercises)
+		// Preload the association table with ordering.
 		Preload("WorkoutExercises", func(db *gorm.DB) *gorm.DB {
-			return db.Order("workout_exercises.[order] asc") // Ensure correct order
+			return db.Order("workout_exercises.[order] asc")
 		}).
-		// Preload the actual Exercise details inside the link table
+		// Preload actual Exercise data.
 		Preload("WorkoutExercises.Exercise").
 		First(&plan, id).Error
 	return &plan, err
 }
 
-// GetAllForTrainer fetches plans created by a specific trainer
+// GetAllForTrainer retrieves all workout plans created by a specific trainer.
 func (r *WorkoutRepo) GetAllForTrainer(trainerID uint) ([]models.WorkoutPlan, error) {
 	var plans []models.WorkoutPlan
 	err := config.DB.Where("trainer_id = ?", trainerID).Find(&plans).Error
 	return plans, err
 }
 
-// GetAll fetches all plans (for Members to browse if allowed, or Admins)
-// internal/repositories/workout_repo.go
+// GetAll retrieves all workout plans available in the system.
 func (r *WorkoutRepo) GetAll() ([]models.WorkoutPlan, error) {
 	var plans []models.WorkoutPlan
-
 	err := config.DB.
 		Preload("Trainer").
 		Preload("WorkoutExercises").
@@ -53,18 +53,18 @@ func (r *WorkoutRepo) GetAll() ([]models.WorkoutPlan, error) {
 	return plans, err
 }
 
-// ClearExercises removes all exercise rows for a specific plan
-// Used when editing a plan (we delete old rows and re-insert new ones)
+// ClearExercises removes all associated exercises for a specific plan.
+// Typically used during a plan update to refresh the exercise list.
 func (r *WorkoutRepo) ClearExercises(planID uint) error {
 	return config.DB.Unscoped().Where("workout_plan_id = ?", planID).Delete(&models.WorkoutExercise{}).Error
 }
 
-// Update saves changes to the plan (Name, Notes, and new Exercises list)
+// Update saves changes to an existing workout plan record.
 func (r *WorkoutRepo) Update(plan *models.WorkoutPlan) error {
 	return config.DB.Save(plan).Error
 }
 
-// Delete performs a Soft Delete (Update) so FK constraints don't break
+// Delete performs a soft delete of a workout plan.
 func (r *WorkoutRepo) Delete(id uint) error {
 	return config.DB.Delete(&models.WorkoutPlan{}, id).Error
 }

@@ -9,15 +9,17 @@ import (
 	"strings"
 )
 
+// AuthHandler handles authentication-related requests such as login, registration, and logout.
 type AuthHandler struct {
 	AuthService *services.AuthService
 }
 
+// NewAuthHandler creates a new instance of AuthHandler.
 func NewAuthHandler(authService *services.AuthService) *AuthHandler {
 	return &AuthHandler{AuthService: authService}
 }
 
-// RegisterPage (GET)
+// RegisterPage renders the registration page.
 func (h *AuthHandler) RegisterPage(w http.ResponseWriter, r *http.Request) {
 	data := map[string]any{
 		"Title":     "Register | FitClassMaster",
@@ -29,7 +31,7 @@ func (h *AuthHandler) RegisterPage(w http.ResponseWriter, r *http.Request) {
 	templates.SmartRender(w, r, "register", "", data)
 }
 
-// RegisterPost (POST)
+// RegisterPost handles the submission of the registration form.
 func (h *AuthHandler) RegisterPost(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -49,6 +51,7 @@ func (h *AuthHandler) RegisterPost(w http.ResponseWriter, r *http.Request) {
 		"Email":     email,
 	}
 
+	// Basic validation.
 	if first == "" || last == "" || email == "" || password == "" {
 		data["Error"] = "all fields are required"
 		templates.SmartRender(w, r, "register", "register_form", data)
@@ -62,15 +65,15 @@ func (h *AuthHandler) RegisterPost(w http.ResponseWriter, r *http.Request) {
 		Role:      models.RoleMember,
 	}
 
+	// Attempt to register the new user.
 	if err := h.AuthService.Register(user, password); err != nil {
 		data["Error"] = err.Error()
 		templates.SmartRender(w, r, "register", "register_form", data)
 		return
 	}
 
-	// success
+	// Display success message and clear form fields.
 	data["Success"] = "Registration successful. You can now log in."
-	// Clear the fields except email (optional)
 	data["FirstName"] = ""
 	data["LastName"] = ""
 	data["Email"] = email
@@ -78,12 +81,12 @@ func (h *AuthHandler) RegisterPost(w http.ResponseWriter, r *http.Request) {
 	templates.SmartRender(w, r, "register", "register_form", data)
 }
 
-// LoginPage (GET)
+// LoginPage renders the login page.
 func (h *AuthHandler) LoginPage(w http.ResponseWriter, r *http.Request) {
 	templates.SmartRender(w, r, "login", "", map[string]any{"Title": "Login | FitClassMaster"})
 }
 
-// LoginPost (POST)
+// LoginPost handles user login requests.
 func (h *AuthHandler) LoginPost(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -104,6 +107,7 @@ func (h *AuthHandler) LoginPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Validate user credentials.
 	user, err := h.AuthService.Login(email, password)
 	if err != nil {
 		data["Error"] = "Invalid credentials"
@@ -111,13 +115,13 @@ func (h *AuthHandler) LoginPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Save user ID in session
+	// Create a new session for the authenticated user.
 	if err := auth.SaveUserSession(w, r, user); err != nil {
 		http.Error(w, "session error", http.StatusInternalServerError)
 		return
 	}
 
-	// If this was an HTMX request, instruct htmx to perform a full redirect
+	// Support HTMX client-side redirection.
 	if r.Header.Get("HX-Request") == "true" {
 		w.Header().Set("HX-Redirect", "/")
 		w.WriteHeader(http.StatusNoContent)
@@ -127,10 +131,8 @@ func (h *AuthHandler) LoginPost(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-// Logout (POST)
+// Logout terminates the user's session.
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
-	// Clear the user session using auth helpers
 	_ = auth.ClearUserSession(w, r)
-	// Redirect to login
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

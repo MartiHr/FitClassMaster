@@ -1,3 +1,4 @@
+// Package templates handles HTML template parsing and rendering.
 package templates
 
 import (
@@ -10,33 +11,33 @@ import (
 	"strings"
 )
 
-// baseTmpl holds only the shared layout (and any shared partials if added later).
+// baseTmpl holds the shared layout and any shared partials.
 var baseTmpl *template.Template
 
-// cache holds a fully built template set per page: layout + page file.
+// cache holds fully built template sets per page: layout + specific page file.
 var cache map[string]*template.Template
 
-// devMode enables per-request parsing (hot reload) when DEV_TEMPLATES=1
+// devMode enables per-request parsing (hot reload) when DEV_TEMPLATES=1 is set.
 var devMode bool
 
-// Init builds the template cache at startup: one set per page (layout + page).
+// Init initializes the template engine, building the cache if not in development mode.
 func Init() {
 	devMode = os.Getenv("DEV_TEMPLATES") == "1"
 
-	// Parse the layout once
+	// Parse the shared layout.
 	baseTmpl = template.Must(template.ParseFiles(
 		filepath.Join("internal", "templates", "layout.gohtml"),
 	))
 
-	// In dev mode, skip building the cache to allow hot reload
+	// In development mode, we skip building the cache to allow for hot reloading of templates.
 	if devMode {
 		return
 	}
 
-	// Build the per-page cache
+	// Initialize the template cache.
 	cache = make(map[string]*template.Template)
 
-	// Find all page files (exclude layout.gohtml)
+	// Identify all template files in the directory, excluding the layout.
 	pattern := filepath.Join("internal", "templates", "*.gohtml")
 	files, err := filepath.Glob(pattern)
 	if err != nil {
@@ -48,11 +49,11 @@ func Init() {
 			continue
 		}
 
-		// Page name is file base without extension (e.g., home.gohtml -> "home")
+		// The page name is derived from the filename without extension.
 		base := filepath.Base(f)
 		name := strings.TrimSuffix(base, filepath.Ext(base))
 
-		// Clone base and parse the page into it so it gets that page’s `content` override
+		// Clone the base layout and parse the specific page template into it.
 		cl, err := baseTmpl.Clone()
 		if err != nil {
 			panic(err)
@@ -65,9 +66,9 @@ func Init() {
 	}
 }
 
-// SmartRender automatically detects HTMX + can fall back to fragment
+// SmartRender handles both full-page and HTMX fragment rendering, injecting session context automatically.
 func SmartRender(w http.ResponseWriter, r *http.Request, page string, fragment string, data any) {
-	// Ensure we have a map[string]any to enrich
+	// Ensure data is available as a map for injection.
 	var m map[string]any
 	switch v := data.(type) {
 	case nil:
@@ -78,7 +79,7 @@ func SmartRender(w http.ResponseWriter, r *http.Request, page string, fragment s
 		m = map[string]any{"Data": v}
 	}
 
-	// Inject auth context for templates
+	// Inject authentication and user context for use in templates.
 	m["IsAuthenticated"] = auth.IsAuthenticated(r)
 	if username, ok := auth.GetUsernameFromSession(r); ok {
 		m["Username"] = username
@@ -88,19 +89,21 @@ func SmartRender(w http.ResponseWriter, r *http.Request, page string, fragment s
 		m["UserRole"] = role
 	}
 
+	// If HTMX fragment is requested and provided, render only that part.
 	isHTMX := r.Header.Get("HX-Request") == "true"
 	if isHTMX && fragment != "" {
 		renderFragment(w, page, fragment, m)
 		return
 	}
 
+	// Otherwise, render the full page.
 	render(w, page, m)
 }
 
-// Render renders a full page using the cache in prod, or per-request parse in dev.
+// render executes a full-page template using either the cache or per-request parsing.
 func render(w http.ResponseWriter, name string, data any) {
 	if devMode {
-		// Dev: clone + parse page each request for hot reload
+		// Hot reload: re-parse templates for every request.
 		cl, err := baseTmpl.Clone()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -118,7 +121,7 @@ func render(w http.ResponseWriter, name string, data any) {
 		return
 	}
 
-	// Prod: use cached set
+	// Use pre-cached template set for production.
 	t, ok := cache[name]
 	if !ok {
 		http.Error(w, fmt.Sprintf("template not found: %s", name), http.StatusNotFound)
@@ -129,10 +132,10 @@ func render(w http.ResponseWriter, name string, data any) {
 	}
 }
 
-// RenderFragment executes a named template (e.g., partial) from the cached set of a page
-// in prod, or from a per-request parsed set in dev.
+// renderFragment executes a specific named template within a page's template set.
 func renderFragment(w http.ResponseWriter, pageName, tmplName string, data any) {
 	if devMode {
+		// Hot reload for fragments.
 		cl, err := baseTmpl.Clone()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -150,6 +153,7 @@ func renderFragment(w http.ResponseWriter, pageName, tmplName string, data any) 
 		return
 	}
 
+	// Execute specific fragment from the cache.
 	t, ok := cache[pageName]
 	if !ok {
 		http.Error(w, fmt.Sprintf("template not found: %s", pageName), http.StatusNotFound)

@@ -1,3 +1,5 @@
+// Package main is the entry point for the FitClassMaster application.
+// It initializes the database, sessions, templates, and starts the HTTP server.
 package main
 
 import (
@@ -18,14 +20,14 @@ import (
 )
 
 func main() {
-	// Init DB & session
+	// Initialize Database connection and Session store.
 	config.InitDB()
 	config.InitSessionStore()
 
-	// Init template parsing
+	// Initialize template parsing for HTML rendering.
 	templates.Init()
 
-	// Auto migrate
+	// Auto-migrate database schemas to ensure they match the models.
 	if err := config.DB.AutoMigrate(
 		&models.User{},
 		&models.Class{},
@@ -40,19 +42,18 @@ func main() {
 		log.Fatalf("Migration failed: %v", err)
 	}
 
-	// Router setup
+	// Create a new chi router.
 	r := chi.NewRouter()
 
-	// Middlewares
-	r.Use(middleware.Logger)    // chi logger
-	r.Use(middleware.Recoverer) // chi recoverer
-	//r.Use(middlewares.LoadSession)
+	// Register global middlewares.
+	r.Use(middleware.Logger)    // Log each HTTP request.
+	r.Use(middleware.Recoverer) // Recover from panics without crashing the server.
 
-	// Static files
+	// Serve static files (CSS, JS, images) from the internal/static directory.
 	fileServer := http.FileServer(http.Dir("internal/static"))
 	r.Handle("/static/*", http.StripPrefix("/static/", fileServer))
 
-	// Repositories
+	// Initialize Repositories (Data Access Layer).
 	userRepo := repositories.NewUserRepo()
 	classRepo := repositories.NewClassRepo()
 	enrollRepo := repositories.NewEnrollmentRepo()
@@ -61,7 +62,7 @@ func main() {
 	sessionRepo := repositories.NewSessionRepo()
 	messageRepo := repositories.NewMessageRepo()
 
-	// Services
+	// Initialize Services (Business Logic Layer).
 	authService := services.NewAuthService(userRepo)
 	userService := services.NewUserService(userRepo)
 	classService := services.NewClassService(classRepo)
@@ -71,18 +72,16 @@ func main() {
 	sessionService := services.NewSessionService(sessionRepo)
 	messageService := services.NewMessageService(messageRepo)
 
-	// Initialize and Run the Hub
+	// Initialize and Run the WebSocket Hubs for real-time features.
 	hub := websockets.NewHub(sessionService)
-	go hub.Run() // Run the hub in a separate goroutine
+	go hub.Run() // Hub for workout sessions.
 
 	chatHub := websockets.NewChatHub()
-	go chatHub.Run()
+	go chatHub.Run() // Hub for real-time messaging.
 
-	// Handlers
-
+	// Initialize Handlers (Controller Layer).
 	homeH := handlers.NewHomeHandler()
 	aboutH := handlers.NewAboutHandler()
-
 	authH := handlers.NewAuthHandler(authService)
 	userH := handlers.NewUserHandler(userService)
 	enrollH := handlers.NewEnrollmentHandler(enrollService)
@@ -91,31 +90,26 @@ func main() {
 	adminH := handlers.NewAdminHandler(userService)
 	msgH := handlers.NewMessageHandler(messageService, userService, chatHub)
 	wsH := handlers.NewWSHandler(hub)
-
 	workoutH := handlers.NewWorkoutHandler(workoutService, exerciseService)
 	classH := handlers.NewClassHandler(classService, enrollService)
 	dashboardH := handlers.NewDashboardHandler(enrollService, sessionService)
 
-	// Public routes
+	// Define Public Routes.
 	r.Group(func(r chi.Router) {
 		r.Get("/", homeH.Home)
-
 		r.Get("/register", authH.RegisterPage)
 		r.Post("/register", authH.RegisterPost)
 		r.Get("/login", authH.LoginPage)
 		r.Post("/login", authH.LoginPost)
 		r.Get("/about", aboutH.About)
-
 	})
 
-	// Member tier (Any Logged-in User to start with)
-	// Protected routes
+	// Define Protected Routes (Require Authentication).
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.RequireAuth)
 		r.Use(middlewares.RequireRole(models.RoleMember, models.RoleTrainer, models.RoleAdmin))
 
 		r.Post("/logout", authH.Logout)
-
 		r.Get("/dashboard", dashboardH.Dashboard)
 		r.Get("/profile", userH.ProfilePage)
 		r.Post("/profile/update", userH.UpdateProfile)
@@ -124,7 +118,6 @@ func main() {
 		r.Get("/classes", classH.ClassesPage)
 		r.Get("/classes/{id}", classH.ClassDetailsPage)
 
-		r.Get("/dashboard", dashboardH.Dashboard)
 		r.Post("/enrollments", enrollH.Enroll)
 		r.Delete("/enrollments/{id}", enrollH.Cancel)
 
@@ -146,7 +139,7 @@ func main() {
 		r.Get("/ws/chat", msgH.ServeWS)
 	})
 
-	// Staff tier (Trainer or Admin)
+	// Define Staff Routes (Trainer or Admin Role).
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.RequireAuth)
 		r.Use(middlewares.RequireRole(models.RoleTrainer, models.RoleAdmin))
@@ -168,7 +161,7 @@ func main() {
 		r.Post("/classes/{id}/cancel", classH.Cancel)
 	})
 
-	// Admin tier (Admin Only)
+	// Define Admin Only Routes.
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.RequireAuth)
 		r.Use(middlewares.RequireRole(models.RoleAdmin))
@@ -178,10 +171,10 @@ func main() {
 		r.Post("/admin/users/{id}/delete", adminH.DeleteUser)
 	})
 
-	// Run server
+	// Start the HTTP server.
 	log.Println("✅ Server running at http://localhost:8080")
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {
-		return
+		log.Fatalf("Server failed: %v", err)
 	}
 }

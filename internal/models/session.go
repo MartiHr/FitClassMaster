@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// WorkoutSession represents an instance of a user performing a WorkoutPlan.
 type WorkoutSession struct {
 	gorm.Model
 	UserID uint `json:"user_id"`
@@ -16,12 +17,13 @@ type WorkoutSession struct {
 
 	StartTime time.Time
 	EndTime   time.Time
-	Status    string `gorm:"default:'in_progress'"` // 'in_progress' or 'completed'
+	Status    string `gorm:"default:'in_progress'"` // Possible values: 'in_progress', 'completed'
 
-	// One session has many logged sets
+	// Logs contains the detailed records for each set performed during the session.
 	Logs []SessionLog `gorm:"foreignKey:SessionID"`
 }
 
+// SessionLog records the actual performance of a single set for a specific exercise.
 type SessionLog struct {
 	gorm.Model
 	SessionID uint `json:"session_id"`
@@ -31,11 +33,11 @@ type SessionLog struct {
 
 	SetNumber int     `json:"set_number"`
 	Reps      int     `json:"reps"`
-	Weight    float64 `json:"weight"` // Users log the actual weight used
+	Weight    float64 `json:"weight"` // Actual weight used by the user
 	Notes     string  `json:"notes"`
 }
 
-// GetLog finds a specific log for an exercise and set number
+// GetLog retrieves a specific SessionLog for a given exercise and set number from the session.
 func (s *WorkoutSession) GetLog(exerciseID uint, setNum int) *SessionLog {
 	for _, log := range s.Logs {
 		if log.ExerciseID == exerciseID && log.SetNumber == setNum {

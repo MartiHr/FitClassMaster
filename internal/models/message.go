@@ -6,22 +6,23 @@ import (
 	"gorm.io/gorm"
 )
 
-// Conversation represents a chat history between two users
+// Conversation represents a chat history between two users.
 type Conversation struct {
 	gorm.Model
-	// To prevent duplicate conversations, we can enforce that User1ID < User2ID
+	// User1ID and User2ID represent the participants.
+	// Conventionally, User1ID < User2ID to ensure a unique conversation pair.
 	User1ID uint `gorm:"not null;index"`
 	User1   User `gorm:"foreignKey:User1ID"`
 
 	User2ID uint `gorm:"not null;index"`
 	User2   User `gorm:"foreignKey:User2ID"`
 
-	LastMessageAt time.Time `gorm:"index"` // To sort by "Recent"
+	LastMessageAt time.Time `gorm:"index"` // Used to sort conversations by the most recent activity.
 
 	Messages []Message `gorm:"foreignKey:ConversationID"`
 }
 
-// Message is a single text sent from one user to another
+// Message represents a single text message sent within a conversation.
 type Message struct {
 	gorm.Model
 	ConversationID uint         `gorm:"not null;index"`
