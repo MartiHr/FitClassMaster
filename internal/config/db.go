@@ -5,7 +5,9 @@ import (
 	"encoding/gob"
 	"log"
 	"os"
+	"strings" // <--- Added to check the DSN string
 
+	"gorm.io/driver/postgres" // <--- Added Postgres driver
 	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
 )
@@ -24,8 +26,21 @@ func InitDB() {
 		log.Fatal("DB_DSN env var not set")
 	}
 
-	// Open connection to SQL Server.
-	db, err := gorm.Open(sqlserver.Open(dsn), &gorm.Config{})
+	var dialector gorm.Dialector
+
+	// SMART SWITCH:
+	// If the URL starts with "postgres", we use the Cloud driver.
+	// Otherwise, we default to SQL Server (your local Docker/Windows setup).
+	if strings.HasPrefix(dsn, "postgres") {
+		log.Println("🐘 Connecting to PostgreSQL (Cloud Mode)...")
+		dialector = postgres.Open(dsn)
+	} else {
+		log.Println("🖥️ Connecting to SQL Server (Local Mode)...")
+		dialector = sqlserver.Open(dsn)
+	}
+
+	// Open connection using the selected dialector
+	db, err := gorm.Open(dialector, &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}

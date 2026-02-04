@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # 1. Database Service (Microsoft SQL Server)
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: fitclass_db
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourStrong@Passw0rd
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlvolume:/var/opt/mssql
+
+  # 2. Go Application Service
+  app:
+    build: .
+    container_name: fitclass_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      # OVERRIDE the connection string for Docker
+      # We connect to the host "db" (service name above) instead of localhost
+      - DB_DSN=sqlserver://sa:YourStrong@Passw0rd@db:1433?database=FITCLASSMASTER&encrypt=disable
+
+      # Pass through other settings
+      - GO_ENV=production
+      - DEV_TEMPLATES=0
+
+      # We can read your session key from your local .env file
+      - SESSION_KEY=${SESSION_KEY}
+    restart: always
+
+volumes:
+  sqlvolume:

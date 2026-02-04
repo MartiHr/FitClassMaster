@@ -11,6 +11,7 @@ import (
 	"FitClassMaster/internal/services"
 	"FitClassMaster/internal/templates"
 	"FitClassMaster/internal/websockets"
+	"os"
 
 	"log"
 	"net/http"
@@ -177,9 +178,17 @@ func main() {
 		r.Post("/admin/users/{id}/delete", adminH.DeleteUser)
 	})
 
-	// Start the HTTP server.
-	log.Println("✅ Server running at http://localhost:8080")
-	sErr := http.ListenAndServe(":8080", r)
+	// Get the PORT from the environment (Render sets this automatically).
+	// If it is empty (running locally), default to "8080".
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	log.Printf("✅ Server running on port %s", port)
+
+	// Listen on the dynamic port
+	sErr := http.ListenAndServe(":"+port, r)
 	if sErr != nil {
 		log.Fatalf("Server failed: %v", sErr)
 	}
