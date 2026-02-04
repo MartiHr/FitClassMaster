@@ -74,7 +74,7 @@ func (h *Hub) Run() {
 			log.Printf("🔌 Client left Session Room %d", client.SessionID)
 
 		case msg := <-h.Broadcast:
-			// 1. Save to DB (Async)
+			// Save to DB (Async)
 			go func(m WSMessage) {
 				logEntry := &models.SessionLog{
 					SessionID:  m.SessionID,
@@ -90,7 +90,7 @@ func (h *Hub) Run() {
 				}
 			}(msg)
 
-			// 2. Broadcast to everyone in that specific room (Trainer monitoring)
+			// Broadcast to everyone in that specific room (Trainer monitoring)
 			h.mu.RLock()
 			if clients, ok := h.rooms[msg.SessionID]; ok {
 				for client := range clients {

@@ -25,7 +25,12 @@
 
             <div class="meta-row">
                 <span class="meta-item"><i class="fas fa-user-tie"></i> Coach {{ .Plan.Trainer.FullName }}</span>
-                <span class="meta-item"><i class="fas fa-calendar"></i> Created {{ .Plan.CreatedAt.Format "Jan 02, 2006" }}</span>
+
+                <a href="/messages/start/{{ .Plan.TrainerID }}" class="btn-message" title="Message Trainer">
+                    <i class="fas fa-comment-dots"></i>
+                </a>
+
+                <span class="meta-item"><i class="fas fa-calendar"></i> Created {{ .Plan.CreatedAt.Format "Jan 02" }}</span>
             </div>
 
             <p class="description">{{ .Plan.Description }}</p>

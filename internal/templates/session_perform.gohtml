@@ -122,7 +122,7 @@
         let socket = new WebSocket(socketUrl);
         let timerInterval;
 
-        // --- 1. WebSocket Handlers ---
+        // --- WebSocket Handlers ---
         socket.onopen = () => {
             const badge = document.querySelector('.status-badge');
             if(badge) {
@@ -192,7 +192,7 @@
             }
         }
 
-        // --- 2. Synced Timer Logic ---
+        // --- Synced Timer Logic ---
         // We use the Server Start Time, not Client Time
         const serverStart = new Date("{{ .Session.StartTime.Format "2006-01-02T15:04:05Z07:00" }}").getTime();
 
@@ -242,11 +242,11 @@
 
         startTimer();
 
-        // --- 3. Finish Workflow ---
+        // --- Finish Workflow ---
         function finishSession() {
             if(!confirm("Are you sure you want to finish?")) return;
 
-            // 1. Notify Trainer via Socket FIRST
+            // Notify Trainer via Socket FIRST
             if (socket.readyState === WebSocket.OPEN) {
                 socket.send(JSON.stringify({
                     type: "session_finished",
@@ -254,7 +254,7 @@
                 }));
             }
 
-            // 2. Call Backend to save and redirect
+            // Call Backend to save and redirect
             fetch(`/sessions/${sessionID}/finish`, { method: 'POST' })
                 .then(response => {
                     if (response.ok) {

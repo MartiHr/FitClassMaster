@@ -57,8 +57,8 @@ func (h *SessionHandler) PerformPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// It is a "Watcher" (Read-Only) view if:
-	// 1. The user is NOT the owner (Trainer viewing Member)
-	// 2. OR the session is already finished (Member viewing History)
+	// The user is NOT the owner (Trainer viewing Member)
+	// OR the session is already finished (Member viewing History)
 	isWatcher := (session.UserID != currentUserID) || (session.Status == "completed")
 
 	data := map[string]any{

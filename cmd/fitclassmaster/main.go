@@ -34,7 +34,9 @@ func main() {
 		&models.WorkoutPlan{},
 		&models.WorkoutExercise{},
 		&models.WorkoutSession{},
-		&models.SessionLog{}); err != nil {
+		&models.SessionLog{},
+		&models.Conversation{},
+		&models.Message{}); err != nil {
 		log.Fatalf("Migration failed: %v", err)
 	}
 
@@ -57,6 +59,7 @@ func main() {
 	exerciseRepo := repositories.NewExerciseRepo()
 	workoutRepo := repositories.NewWorkoutRepo()
 	sessionRepo := repositories.NewSessionRepo()
+	messageRepo := repositories.NewMessageRepo()
 
 	// Services
 	authService := services.NewAuthService(userRepo)
@@ -66,10 +69,14 @@ func main() {
 	exerciseService := services.NewExerciseService(exerciseRepo)
 	workoutService := services.NewWorkoutService(workoutRepo)
 	sessionService := services.NewSessionService(sessionRepo)
+	messageService := services.NewMessageService(messageRepo)
 
 	// Initialize and Run the Hub
 	hub := websockets.NewHub(sessionService)
 	go hub.Run() // Run the hub in a separate goroutine
+
+	chatHub := websockets.NewChatHub()
+	go chatHub.Run()
 
 	// Handlers
 
@@ -82,7 +89,8 @@ func main() {
 	sessionH := handlers.NewSessionHandler(sessionService)
 	exerciseH := handlers.NewExerciseHandler(exerciseService)
 	adminH := handlers.NewAdminHandler(userService)
-	wsHandler := handlers.NewWSHandler(hub)
+	msgH := handlers.NewMessageHandler(messageService, userService, chatHub)
+	wsH := handlers.NewWSHandler(hub)
 
 	workoutH := handlers.NewWorkoutHandler(workoutService, exerciseService)
 	classH := handlers.NewClassHandler(classService, enrollService)
@@ -91,7 +99,7 @@ func main() {
 	// Public routes
 	r.Group(func(r chi.Router) {
 		r.Get("/", homeH.Home)
-		//r.Get("/htmx/hello", homeH.HelloHtmx)
+
 		r.Get("/register", authH.RegisterPage)
 		r.Post("/register", authH.RegisterPost)
 		r.Get("/login", authH.LoginPage)
@@ -112,13 +120,13 @@ func main() {
 		r.Get("/profile", userH.ProfilePage)
 		r.Post("/profile/update", userH.UpdateProfile)
 		r.Post("/profile/update-password", userH.UpdatePassword)
+
 		r.Get("/classes", classH.ClassesPage)
+		r.Get("/classes/{id}", classH.ClassDetailsPage)
 
 		r.Get("/dashboard", dashboardH.Dashboard)
 		r.Post("/enrollments", enrollH.Enroll)
 		r.Delete("/enrollments/{id}", enrollH.Cancel)
-
-		r.Get("/classes/{id}", classH.ClassDetailsPage)
 
 		r.Get("/exercises", exerciseH.List)
 
@@ -128,8 +136,14 @@ func main() {
 		r.Post("/sessions/start", sessionH.Start)
 		r.Get("/sessions/{id}/perform", sessionH.PerformPage)
 
-		r.Get("/ws/session/{id}", wsHandler.HandleSessionConnection)
+		r.Get("/ws/session/{id}", wsH.HandleSessionConnection)
 		r.Post("/sessions/{id}/finish", sessionH.Finish)
+
+		r.Get("/messages", msgH.InboxPage)
+		r.Get("/messages/{id}", msgH.ThreadPage)
+		r.Post("/messages/send", msgH.SendPost)
+		r.Get("/messages/start/{userID}", msgH.StartChat)
+		r.Get("/ws/chat", msgH.ServeWS)
 	})
 
 	// Staff tier (Trainer or Admin)
