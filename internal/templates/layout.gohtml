@@ -33,11 +33,12 @@
             <div class="nav-links">
                 <a href="/">Home</a>
                 {{ if .IsAuthenticated }}
-                    <a href="/classes">Classes</a>
                     <a href="/dashboard">Dashboard</a>
+                    <a href="/classes">Classes</a>
                     <a href="/workout-plans">Workouts</a>
                     <a href="/exercises">Exercises</a>
                     <a href="/profile">Profile</a>
+                    <a href="/messages"><i class="fa-solid fa-message"></i> Messages</a>
 
                     {{ if eq .UserRole "admin" }}
                         <a href="/admin/users" style="color: #f1c40f;">

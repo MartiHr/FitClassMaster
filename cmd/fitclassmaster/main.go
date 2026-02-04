@@ -17,9 +17,15 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("No .env file found, using system environment variables")
+	}
+
 	// Initialize Database connection and Session store.
 	config.InitDB()
 	config.InitSessionStore()
@@ -173,8 +179,8 @@ func main() {
 
 	// Start the HTTP server.
 	log.Println("✅ Server running at http://localhost:8080")
-	err := http.ListenAndServe(":8080", r)
-	if err != nil {
-		log.Fatalf("Server failed: %v", err)
+	sErr := http.ListenAndServe(":8080", r)
+	if sErr != nil {
+		log.Fatalf("Server failed: %v", sErr)
 	}
 }
