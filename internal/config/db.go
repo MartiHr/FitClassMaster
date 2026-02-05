@@ -2,12 +2,13 @@
 package config
 
 import (
+	"FitClassMaster/internal/models"
 	"encoding/gob"
 	"log"
 	"os"
-	"strings" // <--- Added to check the DSN string
+	"strings"
 
-	"gorm.io/driver/postgres" // <--- Added Postgres driver
+	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
 )
@@ -46,4 +47,22 @@ func InitDB() {
 	}
 
 	DB = db
+}
+
+func RunMigrations() {
+	err := DB.AutoMigrate(
+		&models.User{},
+		&models.Class{},
+		&models.Enrollment{},
+		&models.Exercise{},
+		&models.WorkoutPlan{},
+		&models.WorkoutExercise{},
+		&models.WorkoutSession{},
+		&models.SessionLog{},
+		&models.Conversation{},
+		&models.Message{},
+	)
+	if err != nil {
+		log.Fatalf("Migration failed: %v", err)
+	}
 }
