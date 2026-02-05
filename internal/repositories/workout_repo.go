@@ -27,7 +27,7 @@ func (r *WorkoutRepo) GetByID(id uint) (*models.WorkoutPlan, error) {
 		Preload("Trainer").
 		// Preload the association table with ordering.
 		Preload("WorkoutExercises", func(db *gorm.DB) *gorm.DB {
-			return db.Order("workout_exercises.[order] asc")
+			return db.Order("sort_order asc")
 		}).
 		// Preload actual Exercise data.
 		Preload("WorkoutExercises.Exercise").

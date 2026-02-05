@@ -25,11 +25,11 @@ type WorkoutExercise struct {
 	Exercise   Exercise `gorm:"foreignKey:ExerciseID" json:"exercise"`
 
 	// Specific instructions for this plan.
-	Sets     int    `json:"sets"`     // e.g., 3
-	Reps     int    `json:"reps"`     // e.g., 12
-	Duration int    `json:"duration"` // Duration in seconds (for exercises like planks or cardio)
-	Notes    string `json:"notes"`    // Additional instructions (e.g., "Rest 60s between sets")
-	Order    int    `json:"order"`    // Sequence order of the exercise within the plan
+	Sets     int    `json:"sets"`                           // e.g., 3
+	Reps     int    `json:"reps"`                           // e.g., 12
+	Duration int    `json:"duration"`                       // Duration in seconds (for exercises like planks or cardio)
+	Notes    string `json:"notes"`                          // Additional instructions (e.g., "Rest 60s between sets")
+	Order    int    `gorm:"column:sort_order" json:"order"` // Sequence order of the exercise within the plan
 }
 
 // SetList returns a slice of integers from 1 up to the number of Sets.

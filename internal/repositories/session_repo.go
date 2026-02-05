@@ -27,7 +27,7 @@ func (r *SessionRepo) GetByID(id uint) (*models.WorkoutSession, error) {
 		Preload("WorkoutPlan").
 		Preload("WorkoutPlan.WorkoutExercises", func(db *gorm.DB) *gorm.DB {
 			// Order exercises as defined in the plan.
-			return db.Order("workout_exercises.[order] asc")
+			return db.Order("sort_order asc")
 		}).
 		Preload("WorkoutPlan.WorkoutExercises.Exercise").
 		Preload("Logs").
