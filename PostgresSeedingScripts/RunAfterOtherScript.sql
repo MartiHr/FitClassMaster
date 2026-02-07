@@ -1,0 +1,1 @@
+UPDATE workout_exercises SET sort_order = order;
