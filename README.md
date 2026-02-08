@@ -1,84 +1,126 @@
-# [FitClassMaster](https://fitclass-app.onrender.com/)
+# FitClassMaster
 
-FitClassMaster provides gyms, trainers, and members with a structured digital platform for organizing fitness classes and tracking workout progress.
+**FitClassMaster** is a comprehensive web-based platform designed to bridge the gap between gym management, trainer planning, and member performance. It moves fitness tracking away from scattered spreadsheets into a single, real-time ecosystem, featuring class scheduling, detailed workout planning, and live session monitoring.
 
-FitClassMaster is a comprehensive digital platform designed for gyms, trainers, and fitness enthusiasts. It provides a structured environment for organizing fitness classes, managing workout plans, tracking session progress in real-time using WebSockets, and facilitating communication between trainers and members.
+🌐 **Live Demo:** [https://fitclass-app.onrender.com/](https://fitclass-app.onrender.com/)
 
-## 🚀 Features
+---
 
-- **User Management**: Multi-tier access control for Members, Trainers, and Admins.
-- **Class Scheduling**: Trainers can create, edit, and manage fitness classes. Members can browse and enroll in classes.
-- **Workout Planning**: Create detailed workout plans with specific exercises, sets, reps, and notes.
-- **Real-time Workout Tracking**: Perform workouts with a live tracker. Trainers can monitor member progress in real-time via WebSockets.
-- **Messaging System**: Built-in chat system for direct communication between trainers and members.
-- **Dashboard**: Personalized views for members and trainers to track schedules and active sessions.
-- **Modern UI**: Built with Go Templates, and HTMX for a smooth, single-page application feel without the complexity of a heavy frontend framework.
+## 📋 Functionality
 
-## 🛠 Tech Stack
+The system operates on a role-based access model, providing specific tools for three distinct user groups:
 
-- **Backend**: [Go](https://go.dev/) (Golang)
-- **Router**: [Chi](https://github.com/go-chi/chi)
-- **Database**: [GORM](https://gorm.io/) (Object-Relational Mapper)
-- **Real-time**: [WebSockets](https://github.com/gorilla/websocket)
-- **Session Management**: [Gorilla Sessions](https://github.com/gorilla/sessions)
-- **Frontend**: Go Templates, [HTMX](https://htmx.org/)
+### 1. Members
+* **Personal Dashboard:** View active subscriptions, upcoming classes, and workout history.
+* **Class Enrollment:** Browse the schedule and book spots in group fitness classes.
+* **Workout Execution:** A mobile-friendly interface to start workout sessions and log data (reps, sets, weight) in real-time.
+* **Communication:** Built-in chat system to message trainers directly.
 
-## 🏃 Getting Started
+### 2. Trainers
+* **Workout Plan Management:** Create and edit detailed workout templates with specific exercises, ordering, and instructions.
+* **Live Tracking:** Monitor active client sessions in real-time. Using WebSockets, the trainer sees every set completed by the client instantly without refreshing the page.
+* **Class Management:** Schedule, modify, or cancel group classes and view attendee lists.
+
+### 3. Admins
+* **User Management:** Oversee all registered users and manage role assignments (Member/Trainer/Admin).
+* **System Oversight:** Full access to all platform data for maintenance and support.
+
+---
+
+## 🏗 Architecture
+
+The project follows a **Layered Architecture** to ensure Separation of Concerns, maintainability, and testability.
+
+1.  **Presentation Layer (Handlers & Templates):**
+    * Handles HTTP requests and renders HTML using **Go Templates** (Server-Side Rendering).
+    * Utilizes **HTMX** for dynamic, partial page updates, providing a Single-Page Application (SPA) feel without heavy JavaScript frameworks.
+2.  **Business Logic Layer (Services):**
+    * Contains the core rules of the application (e.g., class capacity validation, session state management).
+    * Isolates business logic from the database and HTTP transport layers.
+3.  **Data Access Layer (Repositories):**
+    * Abstracts direct database interactions using **GORM**.
+    * Handles all CRUD operations and queries.
+
+---
+
+## 💻 Tech Stack
+
+### Backend
+* **Language:** [Go (Golang) 1.22+](https://go.dev/)
+* **Router:** [Chi](https://github.com/go-chi/chi) - A lightweight, idiomatic router for Go.
+* **ORM:** [GORM](https://gorm.io/) - For object-relational mapping.
+* **Real-time:** [Gorilla WebSocket](https://github.com/gorilla/websocket) - For bidirectional communication.
+* **Sessions:** Gorilla Sessions - For secure user session management.
+
+### Frontend
+* **Template Engine:** Go `html/template`.
+* **HTMX:** For AJAX requests and dynamic DOM manipulation.
+* **CSS:** Custom styling with FontAwesome for icons.
+
+### Infrastructure & DevOps
+* **Database:** PostgreSQL.
+* **Containerization:** Docker & Docker Compose.
+* **Cloud Platform:** Render.com (Auto-deploy via Git).
+
+---
+
+## 🗂 Data Model
+
+The application uses a relational database (PostgreSQL) with the following key entities:
+
+* **Users:** Stores profile data, password hashes, and roles (Admin, Trainer, Member).
+* **Classes:** Represents group sessions with schedules, capacity, and assigned trainers.
+* **Enrollments:** A Many-to-Many relationship table between Users and Classes.
+* **WorkoutPlans:** Templates for structured workouts created by trainers.
+* **WorkoutExercises:** Defines the specific exercises, order, and targets within a plan.
+* **Sessions:** Represents an active or completed workout instance.
+* **SessionLogs:** Granular data for every set performed (weight/reps) linked to a session.
+* **Messages & Conversations:** Stores chat history between users.
+
+---
+
+## ⚙️ Configuration & Installation
 
 ### Prerequisites
+* **Docker Desktop** (Recommended) OR **Go 1.22+** and a local **PostgreSQL** instance.
 
-- Go 1.22 or higher
-- A SQL Server instance (or modify the driver in `internal/config/db.go` for other databases)
+### Option 1: Running with Docker (Recommended)
+This method automatically builds the application and sets up the database in isolated containers.
 
-### Environment Variables
+1.  Clone the repository:
+    ```bash
+    git clone [https://github.com/your-username/FitClassMaster.git](https://github.com/your-username/FitClassMaster.git)
+    cd FitClassMaster
+    ```
+2.  Build and start the containers:
+    ```bash
+    docker compose up --build
+    ```
+3.  Access the application at: `http://localhost:8080`
 
-The application requires the following environment variables:
+*To stop the application:* `docker compose down`
 
-- `DB_DSN`: Database connection string (e.g., `sqlserver://username:password@localhost:1433?database=FitClassMaster`)
-- `SESSION_KEY`: A secret key for session encryption.
-- `DEV_TEMPLATES`: (Optional) Set to `1` to enable hot-reloading of HTML templates.
+### Option 2: Local Manual Setup
+1.  Create a `.env` file in the root directory:
+    ```env
+    PORT=8080
+    DB_DSN="host=localhost user=postgres password=yourpass dbname=fitclass port=5432 sslmode=disable"
+    SESSION_KEY="your-secret-key"
+    ```
+2.  Install dependencies:
+    ```bash
+    go mod tidy
+    ```
+3.  Run the application:
+    ```bash
+    go run main.go
+    ```
+---
 
- ### Running with Docker
+## 📚 References
 
-If you prefer not to install Go locally, you can run the application using Docker:
-
-1. **Build and Start the containers:**
-   ```bash
-   docker compose up --build
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/FitClassMaster.git
-   cd FitClassMaster
-   ```
-
-2. Install dependencies:
-   ```bash
-   go mod tidy
-   ```
-
-3. Run the application:
-   ```bash
-   go run cmd/fitclassmaster/main.go
-   ```
-
-The server will start at `http://localhost:8080`.
-
-## 📂 Project Structure
-
-- `cmd/`: Main entry point of the application.
-- `internal/config/`: Database and session configuration.
-- `internal/handlers/`: HTTP request handlers.
-- `internal/middlewares/`: Custom HTTP middlewares (Auth, Roles, etc.).
-- `internal/models/`: GORM database models.
-- `internal/repositories/`: Database abstraction layer.
-- `internal/services/`: Business logic layer.
-- `internal/templates/`: HTML templates and rendering logic.
-- `internal/websockets/`: WebSocket hub and connection logic.
-- `internal/static/`: Static assets (CSS, JS).
-
-## 📄 License
-
-This project is licensed under the GPL-3.0 License.
+* [Go Programming Language Documentation](https://go.dev/doc/)
+* [GORM Guides](https://gorm.io/docs/)
+* [HTMX Documentation](https://htmx.org/docs/)
+* [Chi Router](https://github.com/go-chi/chi)
+* [Gorilla WebSocket](https://github.com/gorilla/websocket)
