@@ -38,6 +38,14 @@ The application requires the following environment variables:
 - `SESSION_KEY`: A secret key for session encryption.
 - `DEV_TEMPLATES`: (Optional) Set to `1` to enable hot-reloading of HTML templates.
 
+ ### Running with Docker
+
+If you prefer not to install Go locally, you can run the application using Docker:
+
+1. **Build and Start the containers:**
+   ```bash
+   docker compose up --build
+
 ### Installation
 
 1. Clone the repository:
