@@ -1,5 +1,3 @@
-// Package main is the entry point for the FitClassMaster application.
-// It initializes the database, sessions, templates, and starts the HTTP server.
 package main
 
 import (
