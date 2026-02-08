@@ -1,4 +1,4 @@
-# FitClassMaster
+# [FitClassMaster](https://fitclass-app.onrender.com/)
 
 **FitClassMaster** is a comprehensive web-based platform designed to bridge the gap between gym management, trainer planning, and member performance. It moves fitness tracking away from scattered spreadsheets into a single, real-time ecosystem, featuring class scheduling, detailed workout planning, and live session monitoring.
 
