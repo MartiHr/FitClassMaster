@@ -25,7 +25,7 @@ func InitSessionStore() {
 	Store.Options = &sessions.Options{
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   false,     // Set to true if using HTTPS.
+		Secure:   true,      // Set to true if using HTTPS.
 		MaxAge:   86400 * 7, // Session expires after one week.
 	}
 }
